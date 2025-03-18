@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
-import db from './db.js' // Importa 'db' desde db.js
 import { PORT } from './config.js'
 
 // Importar rutas modularizadas
@@ -14,6 +13,7 @@ import itemsUsuarisRoutes from './routes/items_usuaris.js'
 import mazoRoutes from './routes/mazo.js'
 import matchmakingRoutes from './routes/matchmaking.js'
 import { swaggerUi, swaggerDocs } from './swagger.js'
+import db from './db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
 
 dotenv.config()
 
@@ -41,5 +41,7 @@ app.get('/', (req, res) => {
 // Iniciar el servidor
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`)
-  console.log(`Documentación disponible en http://localhost:${PORT}/api-docs`)
+  console.log(
+    `Documentación disponible en https://apiplnts-production.up.railway.app/api-docs/`,
+  )
 })

@@ -92,7 +92,9 @@ router.post('/login', async (req, res) => {
   db.query(query, [email], async (err, results) => {
     if (err) {
       console.error('Error en la consulta a la base de datos:', err)
-      return res.status(500).json({ error: 'Error en la base de datos' })
+      return res
+        .status(500)
+        .json({ error: 'Error en la base de datos', details: err.message })
     }
 
     if (results.length === 0) {
