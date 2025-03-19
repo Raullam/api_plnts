@@ -185,6 +185,4 @@ router.post('/login/google', async (req, res) => {
   }
 })
 
-// module.exports = router
-
 export default router
