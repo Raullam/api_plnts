@@ -1,12 +1,9 @@
-import express from 'express'
-import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
-import bcrypt from 'bcryptjs' // Usa bcryptjs para comparar la contraseña
-import jwt from 'jsonwebtoken' // Importamos jwt
-import dotenv from 'dotenv' // Para cargar las variables de entorno
-
-dotenv.config() // Cargar las variables de entorno
-
+const express = require('express')
 const router = express.Router()
+const db = require('../config/db') // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
+const bcrypt = require('bcryptjs') // Usa bcryptjs para comparar la contraseña
+const jwt = require('jsonwebtoken') // Importamos jwt
+require('dotenv').config()
 
 /**
  * @swagger
@@ -92,9 +89,7 @@ router.post('/login', async (req, res) => {
   db.query(query, [email], async (err, results) => {
     if (err) {
       console.error('Error en la consulta a la base de datos:', err)
-      return res
-        .status(500)
-        .json({ error: 'Error en la base de datos', details: err.message })
+      return res.status(500).json({ error: 'Error en la base de datos' })
     }
 
     if (results.length === 0) {
@@ -130,4 +125,64 @@ router.post('/login', async (req, res) => {
   })
 })
 
-export default router // Exportar el router
+router.post('/login/google', async (req, res) => {
+  const { idToken } = req.body
+
+  if (!idToken) {
+    return res.status(400).json({ error: 'Falta el ID Token de Google' })
+  }
+
+  try {
+    // Verificar el ID Token con Google
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    })
+
+    const payload = ticket.getPayload()
+    const email = payload.email
+    const name = payload.name
+    const picture = payload.picture
+
+    // Buscar si el usuario ya existe en la base de datos
+    const query = 'SELECT * FROM usuaris WHERE correu = ?'
+    db.query(query, [email], async (err, results) => {
+      if (err) {
+        console.error('Error en la base de datos:', err)
+        return res.status(500).json({ error: 'Error en la base de datos' })
+      }
+
+      let usuario
+      if (results.length > 0) {
+        usuario = results[0] // Usuario existente
+      } // else {
+      //   // Si el usuario no existe, crearlo en la base de datos
+      //   const insertQuery =
+      //     'INSERT INTO usuaris (nom, correu, contrasenya, imatgePerfil) VALUES (?, ?, ?, ?)';
+      //   db.query(insertQuery, [name, email, '', picture], (err, result) => {
+      //     if (err) {
+      //       console.error('Error al crear usuario:', err);
+      //       return res.status(500).json({ error: 'Error al registrar usuario' });
+      //     }
+      //     usuario = { id: result.insertId, nom: name, correu: email, imatgePerfil: picture };
+      //   });
+      // }
+
+      // Generar un token JWT propio
+      const token = jwt.sign(
+        { userId: usuario.id, email: usuario.correu },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '1h',
+        },
+      )
+
+      res.json({ message: 'Login con Google exitoso', token, usuario })
+    })
+  } catch (error) {
+    console.error('Error verificando el ID Token de Google:', error)
+    return res.status(401).json({ error: 'Token de Google inválido' })
+  }
+})
+
+module.exports = router
