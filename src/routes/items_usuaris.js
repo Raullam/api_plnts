@@ -127,7 +127,7 @@ router.post('/', async (req, res) => {
       // Verificar si el ítem ya existe para el usuario
       const existingItem = await new Promise((resolve, reject) => {
         db.query(
-          'SELECT * FROM items_usuaris WHERE usuari_id = ? AND item_id = ?',
+          'SELECT * FROM iusuari WHERE usuari_id = ? AND item_id = ?',
           [userId, itemId],
           (err, result) => {
             if (err) reject(err)
@@ -140,7 +140,7 @@ router.post('/', async (req, res) => {
         // Si ya existe, actualizar la cantidad
         await new Promise((resolve, reject) => {
           db.query(
-            'UPDATE items_usuaris SET quantitat = quantitat + ? WHERE usuari_id = ? AND item_id = ?',
+            'UPDATE iusuari SET quantitat = quantitat + ? WHERE usuari_id = ? AND item_id = ?',
             [quantitat, userId, itemId],
             (err, result) => {
               if (err) reject(err)
@@ -152,7 +152,7 @@ router.post('/', async (req, res) => {
         // Si no existe, insertar un nuevo registro
         await new Promise((resolve, reject) => {
           db.query(
-            'INSERT INTO items_usuaris (usuari_id, item_id, quantitat) VALUES (?, ?, ?)',
+            'INSERT INTO iusuari (usuari_id, item_id, quantitat) VALUES (?, ?, ?)',
             [userId, itemId, quantitat],
             (err, result) => {
               if (err) reject(err)
