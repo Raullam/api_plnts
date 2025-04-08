@@ -169,4 +169,34 @@ router.post('/', async (req, res) => {
     res.status(400).json({ success: false, error: error.message })
   }
 })
+
+// ver por id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const items = await new Promise((resolve, reject) => {
+      db.query(
+        'SELECT * FROM iusuari WHERE usuari_id = ?',
+        [id],
+        (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        },
+      )
+    })
+
+    if (items.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'No se encontraron ítems' })
+    }
+
+    res.json({ success: true, items })
+  } catch (error) {
+    console.error('Error al obtener los ítems:', error.message)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 export default router // Exportar el router
