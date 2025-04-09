@@ -82,9 +82,9 @@ const router = express.Router()
  *                   example: Error al realitzar la compra.
  */
 router.post('/', async (req, res) => {
-  const { userId, items, totalCost, nom } = req.body
+  const { userId, items, totalCost } = req.body
 
-  console.log('Datos recibidos:', { userId, items, totalCost, nom })
+  console.log('Datos recibidos:', { userId, items, totalCost })
 
   try {
     // 1️⃣ Obtener el usuario desde la base de datos
@@ -122,7 +122,7 @@ router.post('/', async (req, res) => {
 
     // 4️⃣ Para cada ítem en la compra, actualizar o insertar según corresponda
     for (const item of items) {
-      const { itemId, quantitat } = item
+      const { itemId, quantitat, nom } = item
 
       // Verificar si el ítem ya existe para el usuario
       const existingItem = await new Promise((resolve, reject) => {
