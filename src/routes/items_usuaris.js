@@ -152,7 +152,7 @@ router.post('/', async (req, res) => {
         // Si no existe, insertar un nuevo registro
         await new Promise((resolve, reject) => {
           db.query(
-            'INSERT INTO iusuari (usuari_id, item_id, quantitat) VALUES (?, ?, ?)',
+            'INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?)',
             [userId, itemId, quantitat],
             (err, result) => {
               if (err) reject(err)
