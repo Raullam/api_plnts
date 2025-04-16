@@ -14,6 +14,7 @@ import mazoRoutes from './routes/mazo.js'
 import matchmakingRoutes from './routes/matchmaking.js'
 import { swaggerUi, swaggerDocs } from './swagger.js'
 import db from './db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
+import cofresRoutes from './routes/cofres.js'
 
 dotenv.config()
 
@@ -32,6 +33,7 @@ app.use('/api', loginRoutes)
 app.use('/items_usuaris', itemsUsuarisRoutes)
 app.use('/mazo', mazoRoutes)
 app.use('/matchmaking', matchmakingRoutes)
+app.use('/cofres', cofresRoutes)
 
 // Ruta raíz
 app.get('/', (req, res) => {
