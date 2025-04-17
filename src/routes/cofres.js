@@ -1,6 +1,6 @@
 // routes/cofres.js
 import express from 'express'
-import db from '../db.js'
+import db from '../db.js' // afegit
 const router = express.Router()
 
 // Ruta GET /cofres/:userId
