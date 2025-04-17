@@ -14,7 +14,7 @@ router.get('/:id', (req, res) => {
     if (result.length === 0) {
       return res.status(404).json({ error: 'cofre no trobat' })
     }
-    res.json(result[0])
+    res.json(result)
   })
 })
 
