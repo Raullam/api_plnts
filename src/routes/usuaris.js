@@ -557,7 +557,7 @@ router.put('/:id', auth, async (req, res) => {
         nom = ?, 
         edat = ?, 
         nacionalitat = ?, 
-        codiPostal = ?, 
+        codiPostal = ?
       WHERE id = ?
     `
 
