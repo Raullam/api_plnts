@@ -539,20 +539,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', auth, async (req, res) => {
   const { id } = req.params
-  const {
-    nom,
-    correu,
-    contrasenya,
-    edat,
-    nacionalitat,
-    codiPostal,
-    imatgePerfil,
-    btc,
-    admin,
-    superadmin,
-    LE,
-    nivell,
-  } = req.body
+  const { nom, edat, nacionalitat, codiPostal } = req.body
 
   console.log(`📩 Datos recibidos para actualizar el usuario ${id}:`, req.body)
 
@@ -564,44 +551,17 @@ router.put('/:id', auth, async (req, res) => {
   }
 
   try {
-    let hashedPassword = null
-    if (contrasenya) {
-      hashedPassword = await bcrypt.hash(contrasenya, 10)
-    }
-
     const query = `
       UPDATE usuaris 
       SET 
         nom = ?, 
-        correu = ?, 
-        ${hashedPassword ? 'contrasenya = ?,' : ''} 
         edat = ?, 
         nacionalitat = ?, 
         codiPostal = ?, 
-        imatgePerfil = ?, 
-        btc = ?, 
-        admin = ?, 
-        superadmin = ?, 
-        LE = ?, 
-        nivell = ? 
       WHERE id = ?
     `
 
-    const params = [
-      nom,
-      correu,
-      ...(hashedPassword ? [hashedPassword] : []),
-      edat,
-      nacionalitat,
-      codiPostal,
-      imatgePerfil,
-      btc,
-      admin,
-      superadmin,
-      LE,
-      nivell,
-      id,
-    ]
+    const params = [nom, edat, nacionalitat, codiPostal, id]
 
     db.query(query, params, (err, result) => {
       if (err) {
@@ -645,7 +605,6 @@ router.put('/:id', auth, async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
-
 /**
  * @swagger
  * /usuaris/{id}:
