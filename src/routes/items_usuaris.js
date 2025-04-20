@@ -86,10 +86,25 @@ router.post('/', async (req, res) => {
 
   console.log('Datos recibidos:', { userId, items, totalCost })
 
+  const connection = await new Promise((resolve, reject) => {
+    db.getConnection((err, connection) => {
+      if (err) reject(err)
+      resolve(connection)
+    })
+  })
+
   try {
-    // 1️⃣ Obtener el usuario desde la base de datos
+    // 1️⃣ Iniciar transacción
+    await new Promise((resolve, reject) => {
+      connection.beginTransaction((err) => {
+        if (err) reject(err)
+        resolve()
+      })
+    })
+
+    // 2️⃣ Obtener el usuario desde la base de datos
     const usuario = await new Promise((resolve, reject) => {
-      db.query(
+      connection.query(
         'SELECT * FROM usuaris WHERE id = ?',
         [userId],
         (err, result) => {
@@ -103,14 +118,14 @@ router.post('/', async (req, res) => {
       throw new Error('Usuario no encontrado')
     }
 
-    // 2️⃣ Verificar saldo
+    // 3️⃣ Verificar saldo
     if (usuario.btc < totalCost) {
       throw new Error('Saldo insuficiente')
     }
 
-    // 3️⃣ Restar BTC del usuario
+    // 4️⃣ Restar BTC del usuario
     await new Promise((resolve, reject) => {
-      db.query(
+      connection.query(
         'UPDATE usuaris SET btc = btc - ? WHERE id = ?',
         [totalCost, userId],
         (err, result) => {
@@ -120,18 +135,21 @@ router.post('/', async (req, res) => {
       )
     })
 
-    // 4️⃣ Para cada ítem en la compra, actualizar o insertar según corresponda
+    // 5️⃣ Para cada ítem en la compra, actualizar o insertar según corresponda
     for (const item of items) {
-      const { itemId, quantitat, nom } = item
+      const { itemId, cantidad, nom } = item
+      const quantitat = cantidad // 🔁 Adaptar al nombre del campo en la base de datos
+
+      console.log(`Procesando itemId ${itemId} con cantidad ${quantitat}`)
 
       // Verificar si el ítem ya existe para el usuario
       const existingItem = await new Promise((resolve, reject) => {
-        db.query(
+        connection.query(
           'SELECT * FROM iusuari WHERE usuari_id = ? AND item_id = ?',
           [userId, itemId],
           (err, result) => {
             if (err) reject(err)
-            resolve(result[0]) // ✅ Devuelve un objeto si existe
+            resolve(result[0])
           },
         )
       })
@@ -139,7 +157,7 @@ router.post('/', async (req, res) => {
       if (existingItem) {
         // Si ya existe, actualizar la cantidad
         await new Promise((resolve, reject) => {
-          db.query(
+          connection.query(
             'UPDATE iusuari SET quantitat = quantitat + ? WHERE usuari_id = ? AND item_id = ?',
             [quantitat, userId, itemId],
             (err, result) => {
@@ -151,8 +169,8 @@ router.post('/', async (req, res) => {
       } else {
         // Si no existe, insertar un nuevo registro
         await new Promise((resolve, reject) => {
-          db.query(
-            'INSERT INTO iusuari (usuari_id, item_id, quantitat,nom ) VALUES (?, ?, ?, ?)',
+          connection.query(
+            'INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)',
             [userId, itemId, quantitat, nom],
             (err, result) => {
               if (err) reject(err)
@@ -163,10 +181,30 @@ router.post('/', async (req, res) => {
       }
     }
 
+    // 6️⃣ Confirmar transacción
+    await new Promise((resolve, reject) => {
+      connection.commit((err) => {
+        if (err) reject(err)
+        resolve()
+      })
+    })
+
     res.json({ success: true, message: 'Compra realizada con éxito' })
   } catch (error) {
     console.error('Error en la compra:', error.message)
+
+    // 7️⃣ Si ocurre un error, revertir todos los cambios
+    await new Promise((resolve, reject) => {
+      connection.rollback((err) => {
+        if (err) reject(err)
+        resolve()
+      })
+    })
+
     res.status(400).json({ success: false, error: error.message })
+  } finally {
+    // 8️⃣ Liberar la conexión
+    connection.release()
   }
 })
 
