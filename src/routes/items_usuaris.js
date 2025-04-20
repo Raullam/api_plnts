@@ -191,7 +191,7 @@ router.post('/', async (req, res) => {
 
     res.json({ success: true, message: 'Compra realizada con éxito' })
   } catch (error) {
-    console.error('Error en la compra:', error.message)
+    console.error('Error en la compraa:', error.message)
 
     // 7️⃣ Si ocurre un error, revertir todos los cambios
     await new Promise((resolve, reject) => {
