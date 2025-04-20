@@ -542,26 +542,26 @@ router.put('/:id', auth, async (req, res) => {
   const { nom, edat, nacionalitat, codiPostal } = req.body
 
   console.log(`📩 Datos recibidos para actualizar el usuario ${id}:`, req.body)
-  console.log('🧾 Usuario autenticadoo:', req.user)
+  console.log('🧾 Usuario autenticado:', req.user)
 
-  // Verificar si el usuario autenticado es el mismo que intenta modificar o si es ADMIN
+  // Verificar permisos
   if (req.user.id !== parseInt(id) && req.user.role !== 'ADMIN') {
     return res
       .status(403)
       .json({ error: 'No tienes permiso para modificar este usuario' })
   }
 
+  // Validación básica
+  if (!nom || !edat || !nacionalitat || !codiPostal) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios' })
+  }
+
   try {
     const query = `
       UPDATE usuaris 
-      SET 
-        nom = ?, 
-        edat = ?, 
-        nacionalitat = ?, 
-        codiPostal = ?
+      SET nom = ?, edat = ?, nacionalitat = ?, codiPostal = ?
       WHERE id = ?
     `
-
     const params = [nom, edat, nacionalitat, codiPostal, id]
 
     db.query(query, params, (err, result) => {
@@ -587,12 +587,12 @@ router.put('/:id', auth, async (req, res) => {
             .status(500)
             .json({ error: 'Error al recuperar usuario actualizado' })
         }
+
         if (results.length === 0) {
           return res.status(404).json({ error: 'Usuario no encontrado' })
         }
 
         const user = results[0]
-
         console.log('🔄 Usuario actualizado con éxito:', user)
 
         res.json({
@@ -606,6 +606,7 @@ router.put('/:id', auth, async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
+
 /**
  * @swagger
  * /usuaris/{id}:
