@@ -555,7 +555,17 @@ router.put('/:id', auth, async (req, res) => {
   if (!nom || !edat || !nacionalitat || !codiPostal) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' })
   }
-
+  // ⛑️ Validación de tipos
+  if (
+    typeof nom !== 'string' ||
+    typeof edat !== 'number' ||
+    typeof nacionalitat !== 'string' ||
+    typeof codiPostal !== 'string'
+  ) {
+    return res
+      .status(400)
+      .json({ error: 'Datos inválidos en el cuerpo de la petición' })
+  }
   try {
     const query = `
       UPDATE usuaris 
