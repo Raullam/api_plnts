@@ -542,7 +542,7 @@ router.put('/:id', auth, async (req, res) => {
   const { nom, edat, nacionalitat, codiPostal } = req.body
 
   console.log(`📩 Datos recibidos para actualizar el usuario ${id}:`, req.body)
-  console.log('🧾 Usuario autenticado:', req.user)
+  console.log('🧾 Usuario autenticadoo:', req.user)
 
   // Verificar si el usuario autenticado es el mismo que intenta modificar o si es ADMIN
   if (req.user.id !== parseInt(id) && req.user.role !== 'ADMIN') {
