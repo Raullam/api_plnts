@@ -5,13 +5,9 @@ const router = express.Router()
 
 /**
  * @swagger
- * tags:
- *   name: Cofres
- *   description: Endpoints per a la gestió dels cofres
- */
-/**
- * @swagger
  * /cofres/{id}:
+ * tags:
+ *       - Cofreeeeeeeee
  *   get:
  *     summary: Obtener cofres de un usuario por ID
  *     parameters:
