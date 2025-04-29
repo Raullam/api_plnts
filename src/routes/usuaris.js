@@ -542,7 +542,7 @@ router.post('/api/login', async (req, res) => {
  *       500:
  *         description: Error intern del servidor.
  */
-router.put('/btc/:userId', async (req, res) => {
+router.put('/btc/:userId', auth, async (req, res) => {
   const { userId } = req.params
   const { amount } = req.body
   try {
