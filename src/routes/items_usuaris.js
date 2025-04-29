@@ -13,7 +13,7 @@ const router = express.Router()
  * /items_usuaris:
  *   post:
  *     summary: Realiza la compra de uno o más ítems
- *     tags: [Compras]
+ *     tags: [Compra d'ítems]
  *     security:
  *       - bearerAuth: []  # Si estás usando autenticación con JWT
  *     requestBody:
