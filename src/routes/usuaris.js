@@ -23,26 +23,23 @@ const router = express.Router() // Aquí creas el router correctamente
  * /usuaris:
  *   get:
  *     summary: Obté tots els usuaris
- *     description: Retorna tots els usuaris. Només accessible per usuaris autenticats.
+ *     description: Retorna la llista de tots els usuaris disponibles a la base de dades.
  *     tags:
  *       - Usuaris
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Llista d'usuaris.
+ *         description: Llista d'usuaris retornada correctament.
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Usuari'
- *       401:
- *         description: No autoritzat.
  *       500:
  *         description: Error del servidor.
  */
-router.get('/', auth, (req, res) => {
+
+router.get('/', (req, res) => {
   const query = 'SELECT * FROM usuaris'
   db.query(query, (err, results) => {
     if (err) {
