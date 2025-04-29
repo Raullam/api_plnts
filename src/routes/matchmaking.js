@@ -3,6 +3,45 @@ import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación 
 
 const router = express.Router()
 
+/**
+ * @swagger
+ * tags:
+ *   name: Matchmaking
+ *   description: Endpoints relacionados con el sistema de emparejamiento y partidas
+ */
+/**
+ * @swagger
+ * /agregar:
+ *   post:
+ *     summary: Agrega un usuario a la lista de espera
+ *     tags: [Matchmaking]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nom: { type: string }
+ *               correu: { type: string }
+ *               contrasenya: { type: string }
+ *               edat: { type: integer }
+ *               nacionalitat: { type: string }
+ *               codiPostal: { type: string }
+ *               imatgePerfil: { type: string }
+ *               btc: { type: number }
+ *               admin: { type: boolean }
+ *               superadmin: { type: boolean }
+ *               LE: { type: number }
+ *               nivell: { type: integer }
+ *             required: [nom, correu, contrasenya]
+ *     responses:
+ *       200:
+ *         description: Usuario agregado correctamente
+ *       500:
+ *         description: Error en el servidor
+ */
+
 // Ruta para agregar un usuario a la lista de espera
 router.post('/agregar', (req, res) => {
   const {
@@ -55,6 +94,19 @@ router.post('/agregar', (req, res) => {
   )
 })
 
+/**
+ * @swagger
+ * /lista:
+ *   get:
+ *     summary: Obtener todos los usuarios en la lista de espera
+ *     tags: [Matchmaking]
+ *     responses:
+ *       200:
+ *         description: Lista obtenida exitosamente
+ *       500:
+ *         description: Error en el servidor
+ */
+
 // Ruta para obtener los usuarios que están en espera
 router.get('/lista', (req, res) => {
   const query = 'SELECT * FROM matchmaking_usuaris'
@@ -68,6 +120,24 @@ router.get('/lista', (req, res) => {
     res.status(200).json(results)
   })
 })
+
+/**
+ * @swagger
+ * /eliminar/{id}:
+ *   delete:
+ *     summary: Elimina un usuario de la lista de espera por ID
+ *     tags: [Matchmaking]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado correctamente
+ *       500:
+ *         description: Error en el servidor
+ */
 
 // Ruta para eliminar un usuario de la lista de espera
 router.delete('/eliminar/:id', (req, res) => {
@@ -84,6 +154,23 @@ router.delete('/eliminar/:id', (req, res) => {
     res.status(200).json({ message: 'Usuario eliminado de la lista de espera' })
   })
 })
+/**
+ * @swagger
+ * /eliminar-correu/{correu}:
+ *   delete:
+ *     summary: Elimina un usuario de la lista de espera por correo electrónico
+ *     tags: [Matchmaking]
+ *     parameters:
+ *       - in: path
+ *         name: correu
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado correctamente
+ *       500:
+ *         description: Error en el servidor
+ */
 
 // Ruta para eliminar por correu de la lista de espera
 router.delete('/eliminar-correu/:correu', (req, res) => {
@@ -100,6 +187,34 @@ router.delete('/eliminar-correu/:correu', (req, res) => {
     res.status(200).json({ message: 'Usuario eliminado de la lista de espera' })
   })
 })
+
+/**
+ * @swagger
+ * /crear-partida:
+ *   post:
+ *     summary: Crea una partida entre dos usuarios
+ *     tags: [Matchmaking]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               usuari1:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *               usuari2:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Partida creada correctamente
+ *       500:
+ *         description: Error al crear la partida
+ */
 
 // Ruta para crear una partida entre dos usuarios
 router.post('/crear-partida', (req, res) => {
