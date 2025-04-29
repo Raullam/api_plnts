@@ -10,16 +10,6 @@ const router = express.Router()
 
 /**
  * @swagger
- * components:
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- */
-
-/**
- * @swagger
  * /items_usuaris:
  *   post:
  *     summary: Realiza la compra de uno o más ítems
