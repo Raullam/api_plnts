@@ -8,12 +8,14 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const router = express.Router() // Aquí creas el router correctamente
-
 /**
  * @swagger
- * tags:
- *   name: Usuaris
- *   description: Endpoints per a la gestió de usuaris
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 /**
@@ -21,16 +23,26 @@ const router = express.Router() // Aquí creas el router correctamente
  * /usuaris:
  *   get:
  *     summary: Obté tots els usuaris
- *     description: Retorna una llista de tots els usuaris registrats.
+ *     description: Retorna tots els usuaris. Només accessible per usuaris autenticats.
  *     tags:
  *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Llista d'usuaris obtinguda correctament.
+ *         description: Llista d'usuaris.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Usuari'
+ *       401:
+ *         description: No autoritzat.
  *       500:
- *         description: Error en obtenir els usuaris.
+ *         description: Error del servidor.
  */
-router.get('/', (req, res) => {
+router.get('/', auth, (req, res) => {
   const query = 'SELECT * FROM usuaris'
   db.query(query, (err, results) => {
     if (err) {
@@ -77,74 +89,6 @@ router.get('/:id', (req, res) => {
   })
 })
 
-// /**
-//  * @swagger
-//  * /usuaris:
-//  *   post:
-//  *     summary: Crea un nou usuari
-//  *     description: Afegeix un nou usuari a la base de dades.
-//  *     tags:
-//  *       - Usuaris
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             type: object
-//  *             properties:
-//  *               nom:
-//  *                 type: string
-//  *               correu:
-//  *                 type: string
-//  *               contrasenya:
-//  *                 type: string
-//  *               edat:
-//  *                 type: integer
-//  *               nacionalitat:
-//  *                 type: string
-//  *               codiPostal:
-//  *                 type: string
-//  *               imatgePerfil:
-//  *                 type: string
-//  *     responses:
-//  *       201:
-//  *         description: Usuari creat correctament.
-//  *       500:
-//  *         description: Error en crear l'usuari.
-//  */
-// router.post('/', (req, res) => {
-//   const {
-//     nom,
-//     correu,
-//     contrasenya,
-//     edat,
-//     nacionalitat,
-//     codiPostal,
-//     imatgePerfil,
-//   } = req.body
-//   const query =
-//     'INSERT INTO usuaris (nom, correu, contrasenya, edat, nacionalitat, codiPostal, imatgePerfil) VALUES (?, ?, ?, ?, ?, ?, ?)'
-//   db.query(
-//     query,
-//     [nom, correu, contrasenya, edat, nacionalitat, codiPostal, imatgePerfil],
-//     (err, result) => {
-//       if (err) {
-//         return res.status(500).json({ error: err.message })
-//       }
-//       res.status(201).json({
-//         id: result.insertId,
-//         nom,
-//         correu,
-//         contrasenya,
-//         edat,
-//         nacionalitat,
-//         codiPostal,
-//         imatgePerfil,
-//       })
-//     },
-//   )
-// })
-
 /**
  * @swagger
  * /usuaris:
@@ -182,75 +126,6 @@ router.get('/:id', (req, res) => {
  *       500:
  *         description: Error en crear l'usuari.
  */
-// router.post('/', async (req, res) => {
-//   try {
-//     const {
-//       nom,
-//       correu,
-//       contrasenya,
-//       edat,
-//       nacionalitat,
-//       codiPostal,
-//       imatgePerfil,
-//       btc = 0,
-//     } = req.body
-
-//     // Validación básica
-//     if (!nom || !correu || !contrasenya) {
-//       return res
-//         .status(400)
-//         .json({ error: 'Nom, correu i contrasenya són obligatoris' })
-//     }
-
-//     // Hashear la contraseña
-//     const hashedPassword = await bcrypt.hash(contrasenya, 10)
-
-//     // Insertar usuario en la BD
-//     const query =
-//       'INSERT INTO usuaris (nom, correu, contrasenya, edat, nacionalitat, codiPostal, imatgePerfil, btc) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-//     db.query(
-//       query,
-//       [
-//         nom,
-//         correu,
-//         hashedPassword,
-//         edat,
-//         nacionalitat,
-//         codiPostal,
-//         imatgePerfil,
-//         btc,
-//       ],
-//       (err, result) => {
-//         if (err) {
-//           return res.status(500).json({ error: err.message })
-//         }
-
-//         // Generar token JWT
-//         const token = jwt.sign(
-//           { userId: result.insertId },
-//           process.env.JWT_SECRET,
-//           { expiresIn: '1h' },
-//         )
-
-//         res.status(201).json({
-//           id: result.insertId,
-//           nom,
-//           correu,
-//           contrasenya,
-//           edat,
-//           nacionalitat,
-//           codiPostal,
-//           imatgePerfil,
-//           btc,
-//           token, // Devuelve el token para que el usuario pueda autenticarse
-//         })
-//       },
-//     )
-//   } catch (error) {
-//     console.error('Error en el servidor:', error) // 👀 Ver en consola qué error ocurre
-//     res.status(500).json({ error: error.message }) // ✅ Ahora `error` sí está definido
-//   }
-// })
 router.post('/', async (req, res) => {
   try {
     const {
@@ -261,7 +136,7 @@ router.post('/', async (req, res) => {
       nacionalitat,
       codiPostal,
       imatgePerfil,
-      btc = 1000.0, // Valor por defecto según la BD
+      btc = 0.0, // Valor por defecto según la BD
       admin = false,
       superadmin = false,
       LE = 0,
@@ -338,13 +213,6 @@ router.post('/', async (req, res) => {
 
 /**
  * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *
  * /usuaris/{id}:
  *   put:
  *     summary: Actualitza un usuari
@@ -393,149 +261,6 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: Error intern del servidor en actualitzar l'usuari.
  */
-
-// router.put('/:id', (req, res) => {
-//   const { id } = req.params
-//   const {
-//     nom,
-//     correu,
-//     contrasenya,
-//     edat,
-//     nacionalitat,
-//     codiPostal,
-//     imatgePerfil,
-//   } = req.body
-
-//   const query =
-//     'UPDATE usuaris SET nom = ?, correu = ?, contrasenya = ?, edat = ?, nacionalitat = ?, codiPostal = ?, imatgePerfil = ? WHERE id = ?'
-
-//   db.query(
-//     query,
-//     [
-//       nom,
-//       correu,
-//       contrasenya,
-//       edat,
-//       nacionalitat,
-//       codiPostal,
-//       imatgePerfil,
-//       id,
-//     ],
-//     (err, result) => {
-//       if (err) {
-//         return res.status(500).json({ error: err.message })
-//       }
-
-//       // 🔹 Ahora obtenemos el usuario actualizado
-//       const selectQuery =
-//         'SELECT id, nom, correu, rol FROM usuaris WHERE id = ?'
-//       db.query(selectQuery, [id], (err, results) => {
-//         if (err) {
-//           return res
-//             .status(500)
-//             .json({ error: 'Error al recuperar usuario actualizado' })
-//         }
-//         if (results.length === 0) {
-//           return res.status(404).json({ error: 'Usuario no encontrado' })
-//         }
-
-//         const user = results[0] // ✅ Definir correctamente el usuario
-
-//         // 🔹 Generar token con la información del usuario
-//         const token = jwt.sign(
-//           { userId: user.id, rol: user.rol },
-//           process.env.JWT_SECRET,
-//           { expiresIn: '1h' },
-//         )
-
-//         res.json({
-//           message: 'Usuari actualitzat correctament',
-//           token,
-//           usuario: user,
-//         })
-//       })
-//     },
-//   )
-// })
-
-// router.put('/:id', auth, (req, res) => {
-//   const { id } = req.params
-//   const {
-//     nom,
-//     correu,
-//     contrasenya,
-//     edat,
-//     nacionalitat,
-//     codiPostal,
-//     imatgePerfil,
-//   } = req.body
-
-//   console.log(`📩 Datos recibidos para actualizar el usuario ${id}:`, req.body)
-
-//   // Verificar si el usuario autenticado es el mismo que intenta modificar o si es ADMIN
-//   if (req.user.id !== parseInt(id) && req.user.role !== 'ADMIN') {
-//     return res
-//       .status(403)
-//       .json({ error: 'No tienes permiso para modificar este usuario' })
-//   }
-
-//   const query = `
-//     UPDATE usuaris
-//     SET nom = ?, correu = ?, contrasenya = ?, edat = ?, nacionalitat = ?, codiPostal = ?, imatgePerfil = ?
-//     WHERE id = ?
-//   `
-
-//   db.query(
-//     query,
-//     [
-//       nom,
-//       correu,
-//       contrasenya,
-//       edat,
-//       nacionalitat,
-//       codiPostal,
-//       imatgePerfil,
-//       id,
-//     ],
-//     (err, result) => {
-//       if (err) {
-//         console.error('🚨 Error en la consulta SQL:', err.message)
-//         return res.status(500).json({ error: 'Error interno del servidor' })
-//       }
-
-//       if (result.affectedRows === 0) {
-//         return res.status(404).json({ error: 'Usuario no encontrado' })
-//       }
-
-//       console.log('✅ Usuario actualizado correctamente en la base de datos')
-
-//       // Obtener el usuario actualizado
-//       db.query('SELECT * FROM usuaris WHERE id = ?', [id], (err, results) => {
-//         if (err) {
-//           console.error(
-//             '🚨 Error al recuperar usuario actualizado:',
-//             err.message,
-//           )
-//           return res
-//             .status(500)
-//             .json({ error: 'Error al recuperar usuario actualizado' })
-//         }
-//         if (results.length === 0) {
-//           return res.status(404).json({ error: 'Usuario no encontrado' })
-//         }
-
-//         const user = results[0]
-
-//         console.log('🔄 Usuario actualizado con éxito:', user)
-
-//         res.json({
-//           message: 'Usuario actualizado correctamente',
-//           usuario: user,
-//         })
-//       })
-//     },
-//   )
-// })
 
 router.put('/:id', auth, async (req, res) => {
   const { id } = req.params
