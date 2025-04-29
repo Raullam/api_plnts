@@ -12,38 +12,49 @@ const router = express.Router()
  * @swagger
  * /items_usuaris:
  *   post:
- *     summary: Realitza una compra d'ítems per un usuari
- *     description: Permet a un usuari comprar ítems restando el cost en BTC i actualitzant la seva quantitat de ítems.
- *     tags:
- *       - Items
+ *     summary: Realiza la compra de uno o más ítems
+ *     tags: [Compras]
+ *     security:
+ *       - bearerAuth: []  # Si estás usando autenticación con JWT
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - userId
+ *               - items
+ *               - totalCost
  *             properties:
  *               userId:
  *                 type: integer
- *                 description: ID de l'usuari que realitza la compra.
+ *                 description: ID del usuario que realiza la compra
+ *               totalCost:
+ *                 type: number
+ *                 description: Costo total de la compra en BTC
  *               items:
  *                 type: array
+ *                 description: Lista de ítems a comprar
  *                 items:
  *                   type: object
+ *                   required:
+ *                     - itemId
+ *                     - cantidad
+ *                     - nom
  *                   properties:
  *                     itemId:
  *                       type: integer
- *                       description: ID de l'ítem que es vol comprar.
- *                     quantitat:
+ *                       description: ID del ítem
+ *                     cantidad:
  *                       type: integer
- *                       description: Quantitat de l'ítem a comprar.
- *               totalCost:
- *                 type: number
- *                 format: float
- *                 description: Cost total de la compra en BTC.
+ *                       description: Cantidad a comprar
+ *                     nom:
+ *                       type: string
+ *                       description: Nombre del ítem
  *     responses:
  *       200:
- *         description: Compra realitzada amb èxit.
+ *         description: Compra realizada con éxito
  *         content:
  *           application/json:
  *             schema:
@@ -51,12 +62,10 @@ const router = express.Router()
  *               properties:
  *                 success:
  *                   type: boolean
- *                   example: true
  *                 message:
  *                   type: string
- *                   example: Compra realitzada amb èxit.
  *       400:
- *         description: Error en la compra, per exemple, saldo insuficient o usuari no trobat.
+ *         description: Error en la solicitud o saldo insuficiente
  *         content:
  *           application/json:
  *             schema:
@@ -64,24 +73,10 @@ const router = express.Router()
  *               properties:
  *                 success:
  *                   type: boolean
- *                   example: false
  *                 error:
  *                   type: string
- *                   example: Saldo insuficient.
- *       500:
- *         description: Error intern del servidor.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 error:
- *                   type: string
- *                   example: Error al realitzar la compra.
  */
+
 router.post('/', auth, async (req, res) => {
   const { userId, items, totalCost } = req.body
 
