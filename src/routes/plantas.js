@@ -33,35 +33,6 @@ router.get('/', (req, res) => {
 
 /**
  * @swagger
- * /plantas/usuaris/{id}:
- *   get:
- *     summary: Obtenir totes les plantes d'un usuari específic
- *     tags:
- *       - Plantes
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID de l'usuari
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Llista de plantes de l'usuari obtenguda exitosament
- */
-router.get('/usuaris/:id', (req, res) => {
-  const { id } = req.params
-  const query = 'SELECT * FROM plantas WHERE usuari_id = ?'
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: err.message })
-    }
-    res.json(results)
-  })
-})
-
-/**
- * @swagger
  * /plantas/{id}:
  *   get:
  *     summary: Obtenir una planta por ID
@@ -89,6 +60,35 @@ router.get('/:id', (req, res) => {
       return res.status(404).json({ error: 'Planta no encontrada' })
     }
     res.json(result[0])
+  })
+})
+
+/**
+ * @swagger
+ * /plantas/usuaris/{id}:
+ *   get:
+ *     summary: Obtenir totes les plantes d'un usuari específic
+ *     tags:
+ *       - Plantes
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID de l'usuari
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Llista de plantes de l'usuari obtenguda exitosament
+ */
+router.get('/usuaris/:id', (req, res) => {
+  const { id } = req.params
+  const query = 'SELECT * FROM plantas WHERE usuari_id = ?'
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+    res.json(results)
   })
 })
 
