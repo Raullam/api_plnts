@@ -14,6 +14,8 @@ const router = express.Router()
  * /cofres/{id}:
  *   get:
  *     summary: Obtener cofres de un usuario por ID
+ *     tags:
+ *       - Cofres
  *     parameters:
  *       - in: path
  *         name: id
