@@ -219,6 +219,13 @@ router.post('/', auth, async (req, res) => {
  *         description: ID del usuario (`usuari_id`) que se desea consultar.
  *         schema:
  *           type: string
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         description: Token de autorización (Bearer token).
+ *         schema:
+ *           type: string
+ *           example: 'Bearer your_jwt_token_here'
  *     responses:
  *       '200':
  *         description: Ítems encontrados exitosamente.
