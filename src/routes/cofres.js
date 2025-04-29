@@ -2,6 +2,13 @@
 import express from 'express'
 import db from '../db.js' // afegit
 const router = express.Router()
+
+/**
+ * @swagger
+ * tags:
+ *   name: Cofres
+ *   description: Endpoints per a la gestió dels cofres
+ */
 /**
  * @swagger
  * /cofres/{id}:
