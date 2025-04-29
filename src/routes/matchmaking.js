@@ -160,11 +160,14 @@ router.get('/lista', auth, (req, res) => {
  *   delete:
  *     summary: Elimina un usuario de la lista de espera por ID
  *     tags: [Matchmaking]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema: { type: integer }
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Usuario eliminado correctamente
@@ -173,7 +176,7 @@ router.get('/lista', auth, (req, res) => {
  */
 
 // Ruta para eliminar un usuario de la lista de espera
-router.delete('/eliminar/:id', (req, res) => {
+router.delete('/eliminar/:id', auth, (req, res) => {
   const { id } = req.params
   const query = 'DELETE FROM matchmaking_usuaris WHERE id = ?'
 
