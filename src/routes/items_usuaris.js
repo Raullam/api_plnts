@@ -266,7 +266,7 @@ router.post('/', auth, async (req, res) => {
  *                   type: string
  *                   example: Error al obtener los ítems
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   const { id } = req.params
 
   try {
