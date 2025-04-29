@@ -110,15 +110,38 @@ router.post('/agregar', auth, (req, res) => {
  *   get:
  *     summary: Obtener todos los usuarios en la lista de espera
  *     tags: [Matchmaking]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *                   nom: { type: string }
+ *                   correu: { type: string }
+ *                   contrasenya: { type: string }
+ *                   edat: { type: integer }
+ *                   nacionalitat: { type: string }
+ *                   codiPostal: { type: string }
+ *                   imatgePerfil: { type: string }
+ *                   btc: { type: number }
+ *                   admin: { type: boolean }
+ *                   superadmin: { type: boolean }
+ *                   LE: { type: number }
+ *                   nivell: { type: integer }
+ *                   creado_en: { type: string, format: date-time }
  *       500:
  *         description: Error en el servidor
  */
 
 // Ruta para obtener los usuarios que están en espera
-router.get('/lista', (req, res) => {
+router.get('/lista', auth, (req, res) => {
   const query = 'SELECT * FROM matchmaking_usuaris'
 
   db.query(query, (error, results) => {
