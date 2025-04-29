@@ -204,7 +204,68 @@ router.post('/', auth, async (req, res) => {
   }
 })
 
-// ver por id
+/**
+ * @swagger
+ * /{id}:
+ *   get:
+ *     summary: Obtener ítems del usuario por ID
+ *     description: Retorna los ítems de la tabla `iusuari` para el `usuari_id` especificado.
+ *     tags:
+ *       - Usuarios
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario (`usuari_id`) que se desea consultar.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Ítems encontrados exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       usuari_id:
+ *                         type: string
+ *                         example: "abc123"
+ *                       # Agrega aquí los demás campos relevantes de tu tabla iusuari
+ *       '404':
+ *         description: No se encontraron ítems para el ID proporcionado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: No se encontraron ítems
+ *       '500':
+ *         description: Error del servidor al consultar los ítems.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Error al obtener los ítems
+ */
 router.get('/:id', async (req, res) => {
   const { id } = req.params
 
