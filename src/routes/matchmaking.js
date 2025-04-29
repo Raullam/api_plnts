@@ -1,5 +1,6 @@
 import express from 'express'
 import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
+import auth from '../middleware/auth.js' // Importamos el middleware correctamente
 
 const router = express.Router()
 
@@ -11,10 +12,19 @@ const router = express.Router()
  */
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *
  * /agregar:
  *   post:
  *     summary: Agrega un usuario a la lista de espera
  *     tags: [Matchmaking]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -43,7 +53,7 @@ const router = express.Router()
  */
 
 // Ruta para agregar un usuario a la lista de espera
-router.post('/agregar', (req, res) => {
+router.post('/agregar', auth, (req, res) => {
   const {
     nom,
     correu,
