@@ -4,6 +4,12 @@ import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación 
 const router = express.Router()
 /**
  * @swagger
+ * tags:
+ *   name: Items
+ *   description: Endpoints per a la gestió d'items
+ */
+/**
+ * @swagger
  * /items:
  *   get:
  *     summary: Obté tots els items
