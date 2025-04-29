@@ -1,7 +1,6 @@
 // routes/cofres.js
 import express from 'express'
 import db from '../db.js' // afegit
-import { auth } from 'google-auth-library'
 import auth from '../middleware/auth.js' // Importamos el middleware correctamente
 
 const router = express.Router()
