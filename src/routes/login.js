@@ -9,6 +9,12 @@ dotenv.config()
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 const router = express.Router()
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Endpoints de autenticación de usuarios
+ */
 
 // Función para envolver las consultas en promesas
 const queryPromise = (query, params) => {
@@ -22,6 +28,36 @@ const queryPromise = (query, params) => {
     })
   })
 }
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login tradicional con email y contraseña
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - email
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *       400:
+ *         description: Email o contraseña incorrectos
+ *       500:
+ *         description: Error en la base de datos
+ */
 
 // Ruta de login normal
 router.post('/login', async (req, res) => {
@@ -63,6 +99,33 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ error: 'Error en la base de datos' })
   }
 })
+
+/**
+ * @swagger
+ * /login/google:
+ *   post:
+ *     summary: Login usando Google ID Token
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *             required:
+ *               - idToken
+ *     responses:
+ *       200:
+ *         description: Login con Google exitoso
+ *       400:
+ *         description: Falta el ID Token
+ *       401:
+ *         description: Token de Google inválido
+ */
 
 // Ruta de login con Google
 router.post('/login/google', async (req, res) => {
