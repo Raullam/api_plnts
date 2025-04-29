@@ -10,6 +10,16 @@ const router = express.Router()
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
  * /items_usuaris:
  *   post:
  *     summary: Realiza la compra de uno o más ítems
@@ -225,7 +235,7 @@ router.post('/', auth, async (req, res) => {
  *         description: Token de autorización (Bearer token).
  *         schema:
  *           type: string
- *           example: 'Bearer your_jwt_token_here'
+ *           example: 'Posa aquí el jwt_token'
  *     responses:
  *       '200':
  *         description: Ítems encontrados exitosamente.
