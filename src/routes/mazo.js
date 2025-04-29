@@ -3,6 +3,36 @@ import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación 
 
 const router = express.Router()
 
+/**
+ * @swagger
+ * tags:
+ *   name: Mazo
+ *   description: Endpoints para gestionar el mazo de plantas de un usuario
+ */
+
+/**
+ * @swagger
+ * /{userId}:
+ *   get:
+ *     summary: Obtener el mazo de un usuario por su ID
+ *     tags: [Mazo]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Mazo encontrado
+ *       400:
+ *         description: ID inválido
+ *       404:
+ *         description: No se encontraron plantas
+ *       500:
+ *         description: Error interno del servidor
+ */
+
 // Endpoint para obtener el mazo de un usuario por su ID
 router.get('/:userId', (req, res) => {
   const userId = parseInt(req.params.userId)
@@ -57,6 +87,27 @@ router.get('/:userId', (req, res) => {
   })
 })
 
+/**
+ * @swagger
+ * /correu/{correu}:
+ *   get:
+ *     summary: Obtener el mazo de un usuario por su correo electrónico
+ *     tags: [Mazo]
+ *     parameters:
+ *       - in: path
+ *         name: correu
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Mazo encontrado
+ *       404:
+ *         description: No se encontraron plantas
+ *       500:
+ *         description: Error interno del servidor
+ */
+
 // Endpoint para obtener el mazo de un usuario por su correo
 router.get('/correu/:correu', (req, res) => {
   const correu = req.params.correu
@@ -107,6 +158,41 @@ router.get('/correu/:correu', (req, res) => {
     res.json(rows)
   })
 })
+
+/**
+ * @swagger
+ * /{userId}:
+ *   put:
+ *     summary: Actualiza o crea el mazo de un usuario
+ *     tags: [Mazo]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mazo:
+ *                 type: array
+ *                 maxItems: 3
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Mazo actualizado o creado correctamente
+ *       400:
+ *         description: Datos inválidos
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
 
 // Endpoint para actualizar el mazo de un usuario
 router.put('/:userId', (req, res) => {
@@ -183,6 +269,26 @@ router.put('/:userId', (req, res) => {
     )
   })
 })
+/**
+ * @swagger
+ * /existeMazo/{userId}:
+ *   get:
+ *     summary: Verifica si un usuario ya tiene un mazo creado
+ *     tags: [Mazo]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Resultado de la existencia del mazo
+ *       400:
+ *         description: ID inválido
+ *       500:
+ *         description: Error interno del servidor
+ */
 
 // Endpoint para verificar si un usuario tiene un mazo
 router.get('/existeMazo/:userId', (req, res) => {
