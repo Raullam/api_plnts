@@ -622,9 +622,11 @@ router.put('/:id', auth, async (req, res) => {
  * /usuaris/{id}:
  *   delete:
  *     summary: Elimina un usuari
- *     description: Elimina un usuari de la base de dades per l'ID proporcionat.
+ *     description: Elimina un usuari de la base de dades per l'ID proporcionat. Només l'usuari mateix o un administrador pot fer aquesta acció.
  *     tags:
  *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -635,11 +637,56 @@ router.put('/:id', auth, async (req, res) => {
  *     responses:
  *       200:
  *         description: Usuari eliminat correctament.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Usuari eliminat correctament
+ *       403:
+ *         description: No tens permís per eliminar aquest usuari.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: No tienes permiso para eliminar este usuario
+ *       404:
+ *         description: Usuari no trobat.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Usuario no encontrado
  *       500:
  *         description: Error en eliminar l'usuari.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error intern del servidor
  */
-router.delete('/:id', (req, res) => {
+
+router.delete('/:id', auth, (req, res) => {
   const { id } = req.params
+
+  // Validación de permisos (opcional, recomendado)
+  if (req.user.id !== parseInt(id) && req.user.role !== 'ADMIN') {
+    return res
+      .status(403)
+      .json({ error: 'No tienes permiso para eliminar este usuario' })
+  }
+
   const query = 'DELETE FROM usuaris WHERE id = ?'
   db.query(query, [id], (err, result) => {
     if (err) {
