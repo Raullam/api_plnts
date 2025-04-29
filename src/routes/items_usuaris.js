@@ -211,7 +211,7 @@ router.post('/', auth, async (req, res) => {
  *     summary: Obtener ítems del usuario por ID
  *     description: Retorna los ítems de la tabla `iusuari` para el `usuari_id` especificado.
  *     tags:
- *       - Usuarios
+ *       - Items
  *     parameters:
  *       - name: id
  *         in: path
