@@ -2,6 +2,7 @@ import express from 'express'
 import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import auth from '../middleware/auth.js' // Importamos el middleware correctamente
 
 dotenv.config() // Cargar las variables de entorno
 
@@ -81,7 +82,7 @@ const router = express.Router()
  *                   type: string
  *                   example: Error al realitzar la compra.
  */
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const { userId, items, totalCost } = req.body
 
   console.log('Datos recibidos:', { userId, items, totalCost })
