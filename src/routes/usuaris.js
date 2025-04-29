@@ -514,16 +514,19 @@ router.post('/api/login', async (req, res) => {
  * @swagger
  * /usuaris/btc/{userId}:
  *   put:
- *     summary: Actualitza el saldo de BTC d'un usuari
- *     description: Permet actualitzar el saldo de BTC d'un usuari específic.
+ *     summary: Actualitza el saldo de BTC d’un usuari
+ *     description: Suma una quantitat de BTC al saldo actual d’un usuari identificat pel seu ID.
  *     tags:
  *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID de l’usuari al qual es vol actualitzar el saldo.
  *     requestBody:
  *       required: true
  *       content:
@@ -533,15 +536,27 @@ router.post('/api/login', async (req, res) => {
  *             properties:
  *               amount:
  *                 type: number
- *                 format: float
+ *                 description: Quantitat de BTC a afegir al saldo.
+ *             required:
+ *               - amount
  *     responses:
  *       200:
  *         description: Saldo actualitzat amb èxit.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
  *       400:
- *         description: Error en actualitzar el saldo.
- *       500:
- *         description: Error intern del servidor.
+ *         description: Error en la sol·licitud o actualització.
+ *       401:
+ *         description: No autoritzat. Cal un token vàlid.
  */
+
 router.put('/btc/:userId', auth, async (req, res) => {
   const { userId } = req.params
   const { amount } = req.body
