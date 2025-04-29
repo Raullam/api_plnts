@@ -216,6 +216,9 @@ router.post('/', auth, async (req, res) => {
 
 /**
  * @swagger
+ *  * security:
+ *   - BearerAuth: []
+ *
  * /{id}:
  *   get:
  *     summary: Obtener ítems del usuario por ID
