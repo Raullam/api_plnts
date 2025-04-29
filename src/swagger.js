@@ -1,7 +1,13 @@
+// swagger.js
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-// Configuración de Swagger
+// Definir __dirname manualmente
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -11,11 +17,9 @@ const swaggerOptions = {
       description: "Documentació de l'API de la aplicació de plantes",
     },
   },
-  apis: ['./apps.js', './routes/*.js'], // Incluimos las rutas de la carpeta routes
+  apis: [path.join(__dirname, 'routes/*.js')],
 }
 
-// Generamos la documentación
 const swaggerDocs = swaggerJsdoc(swaggerOptions)
 
-// Exportamos la configuración para usarla en el archivo principal
 export { swaggerUi, swaggerDocs }
