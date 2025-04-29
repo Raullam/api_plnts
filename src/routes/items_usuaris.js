@@ -216,7 +216,14 @@ router.post('/', auth, async (req, res) => {
 
 /**
  * @swagger
- *  * security:
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *
+ * security:
  *   - BearerAuth: []
  *
  * /{id}:
@@ -286,6 +293,7 @@ router.post('/', auth, async (req, res) => {
  *                   type: string
  *                   example: Error al obtener los ítems
  */
+
 router.get('/:id', auth, async (req, res) => {
   const { id } = req.params
 
