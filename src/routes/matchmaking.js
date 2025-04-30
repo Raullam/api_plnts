@@ -224,51 +224,52 @@ router.delete('/eliminar-correu/:correu', (req, res) => {
   })
 })
 
-/**
- * @swagger
- * /crear-partida:
- *   post:
- *     summary: Crea una partida entre dos usuarios
- *     tags: [Matchmaking]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               usuari1:
- *                 type: object
- *                 properties:
- *                   id: { type: integer }
- *               usuari2:
- *                 type: object
- *                 properties:
- *                   id: { type: integer }
- *     responses:
- *       200:
- *         description: Partida creada correctamente
- *       500:
- *         description: Error al crear la partida
- */
+// NO LO USAMOS POR AHORA
+// /**
+//  * @swagger
+//  * /crear-partida:
+//  *   post:
+//  *     summary: Crea una partida entre dos usuarios
+//  *     tags: [Matchmaking]
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             properties:
+//  *               usuari1:
+//  *                 type: object
+//  *                 properties:
+//  *                   id: { type: integer }
+//  *               usuari2:
+//  *                 type: object
+//  *                 properties:
+//  *                   id: { type: integer }
+//  *     responses:
+//  *       200:
+//  *         description: Partida creada correctamente
+//  *       500:
+//  *         description: Error al crear la partida
+//  */
 
-// Ruta para crear una partida entre dos usuarios
-router.post('/crear-partida', (req, res) => {
-  const { usuari1, usuari2 } = req.body
+// // Ruta para crear una partida entre dos usuarios
+// router.post('/crear-partida', (req, res) => {
+//   const { usuari1, usuari2 } = req.body
 
-  const query =
-    'INSERT INTO partidas (usuari1_id, usuari2_id, estado) VALUES (?, ?, "en curs")'
+//   const query =
+//     'INSERT INTO partidas (usuari1_id, usuari2_id, estado) VALUES (?, ?, "en curs")'
 
-  db.query(query, [usuari1.id, usuari2.id], (error, result) => {
-    if (error) {
-      return res
-        .status(500)
-        .json({ message: 'Error al crear la partida', error })
-    }
-    res
-      .status(200)
-      .json({ message: 'Partida creada', partidaId: result.insertId })
-  })
-})
+//   db.query(query, [usuari1.id, usuari2.id], (error, result) => {
+//     if (error) {
+//       return res
+//         .status(500)
+//         .json({ message: 'Error al crear la partida', error })
+//     }
+//     res
+//       .status(200)
+//       .json({ message: 'Partida creada', partidaId: result.insertId })
+//   })
+// })
 
 export default router // Exportar el router

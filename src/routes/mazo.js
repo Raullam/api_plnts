@@ -1,5 +1,6 @@
 import express from 'express'
 import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
+import { auth } from 'google-auth-library'
 
 const router = express.Router()
 
@@ -34,7 +35,7 @@ const router = express.Router()
  */
 
 // Endpoint para obtener el mazo de un usuario por su ID
-router.get('/:userId', (req, res) => {
+router.get('/:userId', auth, (req, res) => {
   const userId = parseInt(req.params.userId)
 
   if (isNaN(userId)) {
@@ -109,7 +110,7 @@ router.get('/:userId', (req, res) => {
  */
 
 // Endpoint para obtener el mazo de un usuario por su correo
-router.get('/correu/:correu', (req, res) => {
+router.get('/correu/:correu', auth, (req, res) => {
   const correu = req.params.correu
 
   // Realizar la consulta con la conexión a la base de datos
@@ -195,7 +196,7 @@ router.get('/correu/:correu', (req, res) => {
  */
 
 // Endpoint para actualizar el mazo de un usuario
-router.put('/:userId', (req, res) => {
+router.put('/:userId', auth, (req, res) => {
   const userId = parseInt(req.params.userId)
   const { mazo } = req.body // Puede contener entre 1 y 3 plantas
 
