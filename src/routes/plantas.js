@@ -1,5 +1,6 @@
 import express from 'express'
 import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
+import auth from '../middleware/auth.js' // Importamos el middleware correctamente
 
 const router = express.Router() // Iniciar el router
 
@@ -21,7 +22,7 @@ const router = express.Router() // Iniciar el router
  *       200:
  *         description: Llista de plantes obtengudes exitosament
  */
-router.get('/', (req, res) => {
+router.get('/', auth, (req, res) => {
   const query = 'SELECT * FROM plantas'
   db.query(query, (err, results) => {
     if (err) {
