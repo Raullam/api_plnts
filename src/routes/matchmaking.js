@@ -192,24 +192,31 @@ router.delete('/eliminar/:id', auth, (req, res) => {
 })
 /**
  * @swagger
- * /eliminar-correu/{correu}:
- *   delete:
- *     summary: Elimina un usuario de la lista de espera por correo electrónico
- *     tags: [Matchmaking]
+ * /plantas/usuaris/{id}:
+ *   get:
+ *     summary: Obtenir totes les plantes d'un usuari específic
+ *     tags:
+ *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: correu
+ *         name: id
  *         required: true
- *         schema: { type: string }
+ *         description: ID de l'usuari
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
- *         description: Usuario eliminado correctamente
+ *         description: Llista de plantes de l'usuari obtenguda exitosament
+ *       401:
+ *         description: No autoritzat, token requerit o invàlid
  *       500:
- *         description: Error en el servidor
+ *         description: Error en obtenir les plantes de l'usuari
  */
 
 // Ruta para eliminar por correu de la lista de espera
-router.delete('/eliminar-correu/:correu', (req, res) => {
+router.delete('/eliminar-correu/:correu', auth, (req, res) => {
   const { correu } = req.params
   const query = 'DELETE FROM matchmaking_usuaris WHERE correu = ?'
 
