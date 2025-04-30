@@ -57,6 +57,8 @@ router.get('/', (req, res) => {
  *     description: Retorna les dades d'un usuari específic pel seu ID.
  *     tags:
  *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -67,12 +69,44 @@ router.get('/', (req, res) => {
  *     responses:
  *       200:
  *         description: Usuari obtingut correctament.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 nom:
+ *                   type: string
+ *                 correu:
+ *                   type: string
+ *                 [altres_camps]:
+ *                   description: Altres propietats de l'usuari
+ *       401:
+ *         description: No autoritzat - Token invàlid o inexistent.
  *       404:
  *         description: Usuari no trobat.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Usuari no trobat
  *       500:
  *         description: Error en obtenir l'usuari.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error inesperat del servidor
  */
-router.get('/:id', (req, res) => {
+
+router.get('/:id', auth, (req, res) => {
   const { id } = req.params
   const query = 'SELECT * FROM usuaris WHERE id = ?'
   db.query(query, [id], (err, result) => {
