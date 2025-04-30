@@ -1,6 +1,6 @@
 import express from 'express'
 import db from '../db.js' // Asegúrate de ajustar la ruta según la ubicación de tu archivo db.js
-import { auth } from 'google-auth-library'
+import auth from '../middleware/auth.js' // Importamos el middleware correctamente
 
 const router = express.Router()
 
