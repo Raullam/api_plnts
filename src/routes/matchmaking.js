@@ -192,27 +192,44 @@ router.delete('/eliminar/:id', auth, (req, res) => {
 })
 /**
  * @swagger
- * /plantas/usuaris/{id}:
- *   get:
- *     summary: Obtenir totes les plantes d'un usuari específic
- *     tags:
- *       - Plantes
+ * /eliminar-correu/{correu}:
+ *   delete:
+ *     summary: Elimina un usuario de la lista de espera por correo electrónico
+ *     tags: [Matchmaking]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: correu
  *         required: true
- *         description: ID de l'usuari
+ *         description: Correo electrónico del usuario a eliminar
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
- *         description: Llista de plantes de l'usuari obtenguda exitosament
+ *         description: Usuario eliminado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Usuario eliminado de la lista de espera
  *       401:
- *         description: No autoritzat, token requerit o invàlid
+ *         description: No autorizado - Token no válido o ausente
  *       500:
- *         description: Error en obtenir les plantes de l'usuari
+ *         description: Error en el servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al eliminar usuario de la lista de espera
+ *                 error:
+ *                   type: object
  */
 
 // Ruta para eliminar por correu de la lista de espera
