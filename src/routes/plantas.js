@@ -123,6 +123,8 @@ router.get('/:id', auth, (req, res) => {
  *     summary: Obtenir totes les plantes d'un usuari específic
  *     tags:
  *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,8 +135,11 @@ router.get('/:id', auth, (req, res) => {
  *     responses:
  *       200:
  *         description: Llista de plantes de l'usuari obtenguda exitosament
+ *       500:
+ *         description: Error en obtenir les plantes de l'usuari
  */
-router.get('/usuaris/:id', (req, res) => {
+
+router.get('/usuaris/:id', auth, (req, res) => {
   const { id } = req.params
   const query = 'SELECT * FROM plantas WHERE usuari_id = ?'
   db.query(query, [id], (err, results) => {
