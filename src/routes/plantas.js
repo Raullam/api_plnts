@@ -15,13 +15,39 @@ const router = express.Router() // Iniciar el router
  * @swagger
  * /plantas:
  *   get:
- *     summary: Obtenir totes les plantas
+ *     summary: Obtenir totes les plantes
  *     tags:
  *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Llista de plantes obtengudes exitosament
+ *         description: Llista de plantes obtinguda exitosament
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *                   usuari_id: { type: integer }
+ *                   nom: { type: string }
+ *                   tipus: { type: string }
+ *                   nivell: { type: integer }
+ *                   atac: { type: integer }
+ *                   defensa: { type: integer }
+ *                   velocitat: { type: integer }
+ *                   habilitat_especial: { type: string }
+ *                   energia: { type: integer }
+ *                   estat: { type: string }
+ *                   raritat: { type: string }
+ *                   imatge: { type: string }
+ *                   ultima_actualitzacio: { type: string, format: date-time }
+ *       500:
+ *         description: Error al servidor
  */
+
 router.get('/', auth, (req, res) => {
   const query = 'SELECT * FROM plantas'
   db.query(query, (err, results) => {
