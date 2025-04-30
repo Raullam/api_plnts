@@ -413,6 +413,8 @@ router.put('/:id', auth, (req, res) => {
  *     description: Esborra una planta de la base de dades.
  *     tags:
  *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -426,6 +428,7 @@ router.put('/:id', auth, (req, res) => {
  *       500:
  *         description: Error en l'eliminació de la planta.
  */
+
 router.delete('/:id', auth, (req, res) => {
   const { id } = req.params
   const query = 'DELETE FROM plantas WHERE id = ?'
