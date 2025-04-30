@@ -62,9 +62,11 @@ router.get('/', auth, (req, res) => {
  * @swagger
  * /plantas/{id}:
  *   get:
- *     summary: Obtenir una planta por ID
+ *     summary: Obtenir una planta per ID
  *     tags:
  *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -74,9 +76,33 @@ router.get('/', auth, (req, res) => {
  *           type: integer
  *     responses:
  *       200:
- *         description: Planta obtenguda exitosament
+ *         description: Planta obtinguda exitosament
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: integer }
+ *                 usuari_id: { type: integer }
+ *                 nom: { type: string }
+ *                 tipus: { type: string }
+ *                 nivell: { type: integer }
+ *                 atac: { type: integer }
+ *                 defensa: { type: integer }
+ *                 velocitat: { type: integer }
+ *                 habilitat_especial: { type: string }
+ *                 energia: { type: integer }
+ *                 estat: { type: string }
+ *                 raritat: { type: string }
+ *                 imatge: { type: string }
+ *                 ultima_actualitzacio: { type: string, format: date-time }
+ *       404:
+ *         description: Planta no trobada
+ *       500:
+ *         description: Error al servidor
  */
-router.get('/:id', (req, res) => {
+
+router.get('/:id', auth, (req, res) => {
   const { id } = req.params
   const query = 'SELECT * FROM plantas WHERE id = ?'
   db.query(query, [id], (err, result) => {
