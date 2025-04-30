@@ -17,6 +17,8 @@ const router = express.Router()
  *   get:
  *     summary: Obtener el mazo de un usuario por su ID
  *     tags: [Mazo]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -26,6 +28,28 @@ const router = express.Router()
  *     responses:
  *       200:
  *         description: Mazo encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *                   usuari_id: { type: integer }
+ *                   nom: { type: string }
+ *                   tipus: { type: string }
+ *                   nivell: { type: integer }
+ *                   atac: { type: integer }
+ *                   defensa: { type: integer }
+ *                   velocitat: { type: integer }
+ *                   habilitat_especial: { type: string }
+ *                   energia: { type: integer }
+ *                   estat: { type: string }
+ *                   raritat: { type: string }
+ *                   imatge: { type: string }
+ *                   ultima_actualitzacio: { type: string, format: date-time }
+ *                   orden: { type: integer }
  *       400:
  *         description: ID inválido
  *       404:
@@ -94,6 +118,8 @@ router.get('/:userId', auth, (req, res) => {
  *   get:
  *     summary: Obtener el mazo de un usuario por su correo electrónico
  *     tags: [Mazo]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: correu
@@ -103,6 +129,28 @@ router.get('/:userId', auth, (req, res) => {
  *     responses:
  *       200:
  *         description: Mazo encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *                   usuari_id: { type: integer }
+ *                   nom: { type: string }
+ *                   tipus: { type: string }
+ *                   nivell: { type: integer }
+ *                   atac: { type: integer }
+ *                   defensa: { type: integer }
+ *                   velocitat: { type: integer }
+ *                   habilitat_especial: { type: string }
+ *                   energia: { type: integer }
+ *                   estat: { type: string }
+ *                   raritat: { type: string }
+ *                   imatge: { type: string }
+ *                   ultima_actualitzacio: { type: string, format: date-time }
+ *                   orden: { type: integer }
  *       404:
  *         description: No se encontraron plantas
  *       500:
@@ -166,6 +214,8 @@ router.get('/correu/:correu', auth, (req, res) => {
  *   put:
  *     summary: Actualiza o crea el mazo de un usuario
  *     tags: [Mazo]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -184,6 +234,8 @@ router.get('/correu/:correu', auth, (req, res) => {
  *                 maxItems: 3
  *                 items:
  *                   type: integer
+ *             required:
+ *               - mazo
  *     responses:
  *       200:
  *         description: Mazo actualizado o creado correctamente
