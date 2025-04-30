@@ -460,6 +460,8 @@ router.delete('/:id', auth, (req, res) => {
  *     description: Retorna un usuari basat en l'adreça de correu proporcionada.
  *     tags:
  *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: correu
@@ -470,12 +472,44 @@ router.delete('/:id', auth, (req, res) => {
  *     responses:
  *       200:
  *         description: Usuari trobat.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 nom:
+ *                   type: string
+ *                 correu:
+ *                   type: string
+ *                 [altres_camps]:
+ *                   description: Altres camps de l'usuari si escau.
+ *       401:
+ *         description: No autoritzat - Token invàlid o inexistent.
  *       404:
  *         description: Usuari no trobat.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Usuari no trobat
  *       500:
  *         description: Error en la cerca de l'usuari.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error inesperat del servidor
  */
-router.get('/correu/:correu', (req, res) => {
+
+router.get('/correu/:correu', auth, (req, res) => {
   const { correu } = req.params
   const query = 'SELECT * FROM usuaris WHERE correu = ?'
   db.query(query, [correu], (err, result) => {
