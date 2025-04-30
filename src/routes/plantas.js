@@ -302,6 +302,8 @@ router.post('/', auth, (req, res) => {
  *     description: Modifica les dades d'una planta existent.
  *     tags:
  *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -344,7 +346,8 @@ router.post('/', auth, (req, res) => {
  *       500:
  *         description: Error en l'actualització de la planta.
  */
-router.put('/:id', (req, res) => {
+
+router.put('/:id', auth, (req, res) => {
   const { id } = req.params
   const {
     nom,
