@@ -144,7 +144,6 @@ router.get('/usuaris/:id', (req, res) => {
     res.json(results)
   })
 })
-
 /**
  * @swagger
  * /plantas:
@@ -153,12 +152,18 @@ router.get('/usuaris/:id', (req, res) => {
  *     description: Endpoint per crear una nova planta a la base de dades.
  *     tags:
  *       - Plantes
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - usuari_id
+ *               - nom
+ *               - tipus
  *             properties:
  *               usuari_id:
  *                 type: integer
@@ -171,13 +176,13 @@ router.get('/usuaris/:id', (req, res) => {
  *                 default: 0
  *               atac:
  *                 type: integer
- *                 default: 0
+ *                 default: 10
  *               defensa:
  *                 type: integer
- *                 default: 0
+ *                 default: 10
  *               velocitat:
  *                 type: integer
- *                 default: 0
+ *                 default: 5
  *               habilitat_especial:
  *                 type: string
  *               energia:
@@ -194,10 +199,42 @@ router.get('/usuaris/:id', (req, res) => {
  *     responses:
  *       201:
  *         description: Planta creada correctament.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 usuari_id:
+ *                   type: integer
+ *                 nom:
+ *                   type: string
+ *                 tipus:
+ *                   type: string
+ *                 nivell:
+ *                   type: integer
+ *                 atac:
+ *                   type: integer
+ *                 defensa:
+ *                   type: integer
+ *                 velocitat:
+ *                   type: integer
+ *                 habilitat_especial:
+ *                   type: string
+ *                 energia:
+ *                   type: integer
+ *                 estat:
+ *                   type: string
+ *                 raritat:
+ *                   type: string
+ *                 imatge:
+ *                   type: string
  *       500:
  *         description: Error en la creació de la planta.
  */
-router.post('/', (req, res) => {
+
+router.post('/', auth, (req, res) => {
   const {
     usuari_id,
     nom,
@@ -386,7 +423,7 @@ router.put('/:id', (req, res) => {
  *       500:
  *         description: Error en l'eliminació de la planta.
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', auth, (req, res) => {
   const { id } = req.params
   const query = 'DELETE FROM plantas WHERE id = ?'
   db.query(query, [id], (err, result) => {
