@@ -110,7 +110,7 @@ router.get('/:id', auth, (req, res) => {
 // Ruta POST /cofres/:userId/:tipo
 router.post('/:userId/:tipo', auth, (req, res) => {
   const { userId, tipo } = req.params
-  const query = 'INSERT INTO cofrees (idusuari, tipo) VALUES (?, ?)'
+  const query = 'INSERT INTO cofrees (idusuari, temps) VALUES (?, ?)'
 
   db.query(query, [userId, tipo], (err, result) => {
     if (err) {
