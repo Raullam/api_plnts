@@ -52,7 +52,7 @@ const router = express.Router()
 // Ruta GET /cofres/:userId
 router.get('/:id', auth, (req, res) => {
   const { id } = req.params
-  const query = 'SELECT * FROM cofrees WHERE idusuari = ?'
+  const query = 'SELECT * FROM cofres WHERE idusuari = ?'
   db.query(query, [id], (err, result) => {
     if (err) {
       return res.status(500).json({ error: err.message })
@@ -110,7 +110,7 @@ router.get('/:id', auth, (req, res) => {
 // Ruta POST /cofres/:userId/:tipo
 router.post('/:userId/:tipo', auth, (req, res) => {
   const { userId, tipo } = req.params
-  const query = 'INSERT INTO cofrees (idusuari, temps) VALUES (?, ?)'
+  const query = 'INSERT INTO cofres (idusuari, temps) VALUES (?, ?)'
 
   db.query(query, [userId, tipo], (err, result) => {
     if (err) {
@@ -168,7 +168,7 @@ router.post('/:userId/:tipo', auth, (req, res) => {
 // Ruta DELETE /cofres/:userId/:cofreId
 router.delete('/:userId/:cofreId', auth, (req, res) => {
   const { userId, cofreId } = req.params
-  const query = 'DELETE FROM cofrees WHERE idusuari = ? AND id = ?'
+  const query = 'DELETE FROM cofres WHERE idusuari = ? AND id = ?'
 
   db.query(query, [userId, cofreId], (err, result) => {
     if (err) {
