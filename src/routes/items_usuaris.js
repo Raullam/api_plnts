@@ -206,13 +206,13 @@ router.post('/', auth, async (req, res) => {
 
 // Ruta POST /items_usuaris_cofre
 router.post('/items_usuaris_cofre', auth, (req, res) => {
-  const { userId, itemId, totalCost } = req.body
+  const { userId, itemId, totalCost, nom } = req.body
 
   const insertQuery = `
     INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
   `
 
-  db.query(insertQuery, [userId, itemId, totalCost], (err, result) => {
+  db.query(insertQuery, [userId, itemId, totalCost, nom], (err, result) => {
     if (err) {
       return res.status(500).json({ error: err.message })
     }
