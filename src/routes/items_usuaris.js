@@ -204,23 +204,96 @@ router.post('/', auth, async (req, res) => {
   }
 })
 
+// // Ruta POST /items_usuaris_cofre
+// router.post('/items_usuaris_cofre', auth, (req, res) => {
+//   const { userId, itemId, totalCost, nom } = req.body
+
+//   const insertQuery = `
+//     INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
+//   `
+
+//   db.query(insertQuery, [userId, itemId, totalCost, nom], (err, result) => {
+//     if (err) {
+//       return res.status(500).json({ error: err.message })
+//     }
+
+//     res.status(200).json({
+//       message: 'Item asignado correctamente al usuario desde cofre',
+//       itemUsuarioId: result.insertId,
+//     })
+//   })
+// })
 // Ruta POST /items_usuaris_cofre
 router.post('/items_usuaris_cofre', auth, (req, res) => {
   const { userId, itemId, totalCost, nom } = req.body
 
-  const insertQuery = `
-    INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
+  if (!userId || !itemId || !totalCost || !nom) {
+    return res
+      .status(400)
+      .json({ error: 'Faltan campos requeridos en el cuerpo de la petición' })
+  }
+
+  const checkQuery = `
+    SELECT quantitat FROM iusuari WHERE usuari_id = ? AND item_id = ?
   `
 
-  db.query(insertQuery, [userId, itemId, totalCost, nom], (err, result) => {
+  db.query(checkQuery, [userId, itemId], (err, results) => {
     if (err) {
-      return res.status(500).json({ error: err.message })
+      return res
+        .status(500)
+        .json({
+          error: 'Error al consultar el item del usuario: ' + err.message,
+        })
     }
 
-    res.status(200).json({
-      message: 'Item asignado correctamente al usuario desde cofre',
-      itemUsuarioId: result.insertId,
-    })
+    if (results.length > 0) {
+      // El ítem ya existe para el usuario, actualizar cantidad
+      const currentQuantity = results[0].quantitat
+      const newQuantity = currentQuantity + totalCost
+
+      const updateQuery = `
+        UPDATE iusuari SET quantitat = ? WHERE usuari_id = ? AND item_id = ?
+      `
+
+      db.query(
+        updateQuery,
+        [newQuantity, userId, itemId],
+        (err, updateResult) => {
+          if (err) {
+            return res
+              .status(500)
+              .json({
+                error: 'Error al actualizar la cantidad: ' + err.message,
+              })
+          }
+
+          return res.status(200).json({
+            message:
+              'Cantidad actualizada correctamente para el ítem del usuario',
+            updated: true,
+          })
+        },
+      )
+    } else {
+      // No existe, insertar nuevo registro
+      const insertQuery = `
+        INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
+      `
+
+      db.query(insertQuery, [userId, itemId, totalCost, nom], (err, result) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ error: 'Error al insertar nuevo ítem: ' + err.message })
+        }
+
+        res.status(200).json({
+          message: 'Ítem asignado correctamente al usuario desde cofre',
+          itemUsuarioId: result.insertId,
+          updated: false,
+        })
+      })
+    }
   })
 })
 
