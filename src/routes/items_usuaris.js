@@ -451,6 +451,9 @@ router.get('/:id', auth, async (req, res) => {
 router.put('/update', auth, async (req, res) => {
   const { items } = req.body
 
+  // Imprimir los ítems que llegaron en el cuerpo de la solicitud
+  console.log('Ítems recibidos:', items)
+
   if (!Array.isArray(items) || items.length === 0) {
     return res
       .status(400)
@@ -468,19 +471,41 @@ router.put('/update', auth, async (req, res) => {
 
     let updatedCount = 0
 
+    // Iterar por los ítems y depurar cada uno
     for (const { usuari_id, item_id, quantitat } of items) {
+      console.log(
+        `Procesando item: usuari_id=${usuari_id}, item_id=${item_id}, quantitat=${quantitat}`,
+      )
+
       if (quantitat > 0) {
+        // Verificar si la consulta a la base de datos está funcionando
         await new Promise((resolve, reject) => {
           connection.query(
-            'UPDATE iusuari SET quantitat = ? WHERE usuari_id = ? AND item_id = ?',
+            'UPDATE iusuari SET quantitat = quantitat - ? WHERE usuari_id = ? AND item_id = ?',
             [quantitat, usuari_id, item_id],
             (err, result) => {
-              if (err) return reject(err)
-              if (result.affectedRows > 0) updatedCount++
+              if (err) {
+                console.error('Error en la consulta:', err)
+                return reject(err)
+              }
+              if (result.affectedRows > 0) {
+                updatedCount++
+                console.log(
+                  `Se actualizó el ítem ${item_id} para el usuario ${usuari_id}`,
+                )
+              } else {
+                console.log(
+                  `No se encontró el ítem ${item_id} para el usuario ${usuari_id}`,
+                )
+              }
               resolve()
             },
           )
         })
+      } else {
+        console.log(
+          `La cantidad de item ${item_id} es menor o igual a 0, no se actualizará.`,
+        )
       }
     }
 
@@ -490,6 +515,7 @@ router.put('/update', auth, async (req, res) => {
 
     res.status(200).json({ success: true, updatedCount })
   } catch (error) {
+    console.error('Error en el proceso:', error.message)
     await new Promise((resolve) => connection.rollback(() => resolve()))
     res.status(500).json({ success: false, error: error.message })
   } finally {
