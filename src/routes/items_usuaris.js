@@ -239,11 +239,9 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
 
   db.query(checkQuery, [userId, itemId], (err, results) => {
     if (err) {
-      return res
-        .status(500)
-        .json({
-          error: 'Error al consultar el item del usuario: ' + err.message,
-        })
+      return res.status(500).json({
+        error: 'Error al consultar el item del usuario: ' + err.message,
+      })
     }
 
     if (results.length > 0) {
@@ -260,11 +258,9 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
         [newQuantity, userId, itemId],
         (err, updateResult) => {
           if (err) {
-            return res
-              .status(500)
-              .json({
-                error: 'Error al actualizar la cantidad: ' + err.message,
-              })
+            return res.status(500).json({
+              error: 'Error al actualizar la cantidad: ' + err.message,
+            })
           }
 
           return res.status(200).json({
@@ -402,6 +398,102 @@ router.get('/:id', auth, async (req, res) => {
   } catch (error) {
     console.error('Error al obtener los ítems:', error.message)
     res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+/**
+ * @swagger
+ * /items_usuaris/update:
+ *   put:
+ *     summary: Actualiza cantidades de ítems existentes para un usuario
+ *     tags: [Items]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - usuari_id
+ *                     - item_id
+ *                     - quantitat
+ *                   properties:
+ *                     usuari_id:
+ *                       type: integer
+ *                     item_id:
+ *                       type: integer
+ *                     quantitat:
+ *                       type: integer
+ *     responses:
+ *       200:
+ *         description: Ítems actualizados correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 updatedCount:
+ *                   type: integer
+ *       400:
+ *         description: Error de solicitud
+ *       500:
+ *         description: Error del servidor
+ */
+router.put('/update', auth, async (req, res) => {
+  const { items } = req.body
+
+  if (!Array.isArray(items) || items.length === 0) {
+    return res
+      .status(400)
+      .json({ success: false, error: 'Lista de ítems vacía o inválida' })
+  }
+
+  const connection = await new Promise((resolve, reject) => {
+    db.getConnection((err, conn) => (err ? reject(err) : resolve(conn)))
+  })
+
+  try {
+    await new Promise((resolve, reject) =>
+      connection.beginTransaction((err) => (err ? reject(err) : resolve())),
+    )
+
+    let updatedCount = 0
+
+    for (const { usuari_id, item_id, quantitat } of items) {
+      if (quantitat > 0) {
+        await new Promise((resolve, reject) => {
+          connection.query(
+            'UPDATE iusuari SET quantitat = ? WHERE usuari_id = ? AND item_id = ?',
+            [quantitat, usuari_id, item_id],
+            (err, result) => {
+              if (err) return reject(err)
+              if (result.affectedRows > 0) updatedCount++
+              resolve()
+            },
+          )
+        })
+      }
+    }
+
+    await new Promise((resolve, reject) =>
+      connection.commit((err) => (err ? reject(err) : resolve())),
+    )
+
+    res.status(200).json({ success: true, updatedCount })
+  } catch (error) {
+    await new Promise((resolve) => connection.rollback(() => resolve()))
+    res.status(500).json({ success: false, error: error.message })
+  } finally {
+    connection.release()
   }
 })
 
