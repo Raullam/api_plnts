@@ -481,7 +481,7 @@ router.put('/update', auth, async (req, res) => {
         // Verificar si la consulta a la base de datos está funcionando
         await new Promise((resolve, reject) => {
           connection.query(
-            'UPDATE iusuari SET quantitat = quantitat - ? WHERE usuari_id = ? AND item_id = ?',
+            'UPDATE iusuari SET quantitat = quantitat - ? WHERE usuari_id = ? AND id = ?',
             [quantitat, usuari_id, item_id],
             (err, result) => {
               if (err) {
