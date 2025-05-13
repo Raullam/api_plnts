@@ -484,7 +484,7 @@ router.delete('/:id', auth, (req, res) => {
  *         description: Error en l'actualització de les estadístiques de la planta.
  */
 
-router.patch('/subirEstadisticasPlanta/:id', verifyToken, async (req, res) => {
+router.patch('/subirEstadisticasPlanta/:id', auth, async (req, res) => {
   const { id } = req.params
   const { velocitat, defensa, atac } = req.body
 
