@@ -445,36 +445,29 @@ router.delete('/:id', auth, (req, res) => {
   })
 })
 
-router.patch('/subirEstadisticasPlanta/:id', auth, async (req, res) => {
+router.patch('/subirEstadisticasPlanta/:id', auth, (req, res) => {
   const { id } = req.params
   const { velocitat, defensa, atac } = req.body
 
-  // Debugging: Ver los parámetros recibidos
   console.log('ID de la planta:', id)
   console.log('Datos recibidos:', { velocitat, defensa, atac })
 
-  // Asignar valores por defecto si no se reciben
-  const velocitatValue = velocitat !== undefined ? velocitat : 0 // Valor por defecto 0 si no se recibe
-  const defensaValue = defensa !== undefined ? defensa : 0 // Valor por defecto 0 si no se recibe
-  const atacValue = atac !== undefined ? atac : 0 // Valor por defecto 0 si no se recibe
+  const velocitatValue = velocitat !== undefined ? velocitat : 0
+  const defensaValue = defensa !== undefined ? defensa : 0
+  const atacValue = atac !== undefined ? atac : 0
 
-  // Crear el query para la actualización
-  let query = 'UPDATE plantas SET '
-  let values = [velocitatValue, defensaValue, atacValue] // Asignamos los valores, incluso si son por defecto
+  const query =
+    'UPDATE plantas SET velocitat = ?, defensa = ?, atac = ? WHERE id = ?'
+  const values = [velocitatValue, defensaValue, atacValue, id]
 
-  query += 'velocitat = ?, defensa = ?, atac = ?, WHERE id = ?'
-  values.push(id)
-
-  // Debugging: Ver la consulta generada y los valores
   console.log('Consulta SQL generada:', query)
   console.log('Valores para la consulta:', values)
 
-  try {
-    // Ejecutamos la consulta
-    const result = await db.query(query, values)
-
-    // Debugging: Ver el resultado de la consulta
-    console.log('Resultado de la consulta:', result)
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error en la consulta:', err.message)
+      return res.status(500).json({ error: err.message })
+    }
 
     if (result.affectedRows === 0) {
       console.log('Error: No se encontró la planta con ID:', id)
@@ -484,11 +477,7 @@ router.patch('/subirEstadisticasPlanta/:id', auth, async (req, res) => {
     res.json({
       message: 'Estadístiques de la planta actualitzades correctament',
     })
-  } catch (err) {
-    // Debugging: Ver el error si ocurre
-    console.log('Error en la consulta:', err.message)
-    res.status(500).json({ error: err.message })
-  }
+  })
 })
 
 export default router // Exportar el router
