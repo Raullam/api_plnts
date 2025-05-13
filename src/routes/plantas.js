@@ -445,84 +445,39 @@ router.delete('/:id', auth, (req, res) => {
   })
 })
 
-/**
- * @swagger
- * /plantas/subirEstadisticasPlanta/{id}:
- *   patch:
- *     summary: Subir les estadístiques d'una planta
- *     description: Modifica les estadístiques (velocitat, defensa, atac) d'una planta existent.
- *     tags:
- *       - Plantes
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de la planta a actualitzar.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               velocitat:
- *                 type: integer
- *               defensa:
- *                 type: integer
- *               atac:
- *                 type: integer
- *     responses:
- *       200:
- *         description: Estadístiques de la planta actualitzades correctament.
- *       404:
- *         description: Planta no trobada.
- *       500:
- *         description: Error en l'actualització de les estadístiques de la planta.
- */
-
 router.patch('/subirEstadisticasPlanta/:id', auth, async (req, res) => {
   const { id } = req.params
   const { velocitat, defensa, atac } = req.body
 
-  // Verificamos si al menos uno de los valores de las estadísticas está presente
-  if (velocitat === undefined && defensa === undefined && atac === undefined) {
-    return res
-      .status(400)
-      .json({ error: 'Cal enviar almenys una estadística per actualitzar.' })
-  }
+  // Debugging: Ver los parámetros recibidos
+  console.log('ID de la planta:', id)
+  console.log('Datos recibidos:', { velocitat, defensa, atac })
+
+  // Asignar valores por defecto si no se reciben
+  const velocitatValue = velocitat !== undefined ? velocitat : 0 // Valor por defecto 0 si no se recibe
+  const defensaValue = defensa !== undefined ? defensa : 0 // Valor por defecto 0 si no se recibe
+  const atacValue = atac !== undefined ? atac : 0 // Valor por defecto 0 si no se recibe
 
   // Crear el query para la actualización
   let query = 'UPDATE plantas SET '
-  let values = []
+  let values = [velocitatValue, defensaValue, atacValue] // Asignamos los valores, incluso si son por defecto
 
-  // Solo añadimos las estadísticas que han sido proporcionadas
-  if (velocitat !== undefined) {
-    query += 'velocitat = ?, '
-    values.push(velocitat)
-  }
-  if (defensa !== undefined) {
-    query += 'defensa = ?, '
-    values.push(defensa)
-  }
-  if (atac !== undefined) {
-    query += 'atac = ?, '
-    values.push(atac)
-  }
-
-  // Eliminamos la última coma
-  query = query.slice(0, -2)
-  query += ' WHERE id = ?'
+  query += 'velocitat = ?, defensa = ?, atac = ?, WHERE id = ?'
   values.push(id)
+
+  // Debugging: Ver la consulta generada y los valores
+  console.log('Consulta SQL generada:', query)
+  console.log('Valores para la consulta:', values)
 
   try {
     // Ejecutamos la consulta
     const result = await db.query(query, values)
 
+    // Debugging: Ver el resultado de la consulta
+    console.log('Resultado de la consulta:', result)
+
     if (result.affectedRows === 0) {
+      console.log('Error: No se encontró la planta con ID:', id)
       return res.status(404).json({ error: 'Planta no trobada' })
     }
 
@@ -530,6 +485,8 @@ router.patch('/subirEstadisticasPlanta/:id', auth, async (req, res) => {
       message: 'Estadístiques de la planta actualitzades correctament',
     })
   } catch (err) {
+    // Debugging: Ver el error si ocurre
+    console.log('Error en la consulta:', err.message)
     res.status(500).json({ error: err.message })
   }
 })
