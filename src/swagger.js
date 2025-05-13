@@ -12,9 +12,10 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API Aplicació de Plantes',
+      title:
+        'API Restful de la aplicació de Tama Plants - PROJECTE FINAL DE GRAU DAM 24/25 CIFP PAU CASESNOVES ',
       version: '1.0.0',
-      description: "Documentació de l'API de la aplicació de plantes",
+      description: "Documentació de l'API REST de Tama Plants",
     },
   },
   apis: [path.join(__dirname, 'routes/*.js')],
