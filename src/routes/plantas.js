@@ -445,4 +445,93 @@ router.delete('/:id', auth, (req, res) => {
   })
 })
 
+/**
+ * @swagger
+ * /plantas/subirEstadisticasPlanta/{id}:
+ *   patch:
+ *     summary: Subir les estadístiques d'una planta
+ *     description: Modifica les estadístiques (velocitat, defensa, atac) d'una planta existent.
+ *     tags:
+ *       - Plantes
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la planta a actualitzar.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               velocitat:
+ *                 type: integer
+ *               defensa:
+ *                 type: integer
+ *               atac:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Estadístiques de la planta actualitzades correctament.
+ *       404:
+ *         description: Planta no trobada.
+ *       500:
+ *         description: Error en l'actualització de les estadístiques de la planta.
+ */
+
+router.patch('/subirEstadisticasPlanta/:id', verifyToken, async (req, res) => {
+  const { id } = req.params
+  const { velocitat, defensa, atac } = req.body
+
+  // Verificamos si al menos uno de los valores de las estadísticas está presente
+  if (velocitat === undefined && defensa === undefined && atac === undefined) {
+    return res
+      .status(400)
+      .json({ error: 'Cal enviar almenys una estadística per actualitzar.' })
+  }
+
+  // Crear el query para la actualización
+  let query = 'UPDATE plantas SET '
+  let values = []
+
+  // Solo añadimos las estadísticas que han sido proporcionadas
+  if (velocitat !== undefined) {
+    query += 'velocitat = ?, '
+    values.push(velocitat)
+  }
+  if (defensa !== undefined) {
+    query += 'defensa = ?, '
+    values.push(defensa)
+  }
+  if (atac !== undefined) {
+    query += 'atac = ?, '
+    values.push(atac)
+  }
+
+  // Eliminamos la última coma
+  query = query.slice(0, -2)
+  query += ' WHERE id = ?'
+  values.push(id)
+
+  try {
+    // Ejecutamos la consulta
+    const result = await db.query(query, values)
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Planta no trobada' })
+    }
+
+    res.json({
+      message: 'Estadístiques de la planta actualitzades correctament',
+    })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router // Exportar el router
