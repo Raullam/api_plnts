@@ -141,7 +141,7 @@ router.post('/', auth, async (req, res) => {
       // Verificar si el ítem ya existe para el usuario
       const existingItem = await new Promise((resolve, reject) => {
         connection.query(
-          'SELECT * FROM iusuari WHERE usuari_id = ? AND item_id = ?',
+          'SELECT * FROM items_usuaris WHERE usuari_id = ? AND item_id = ?',
           [userId, itemId],
           (err, result) => {
             if (err) reject(err)
@@ -154,7 +154,7 @@ router.post('/', auth, async (req, res) => {
         // Si ya existe, actualizar la cantidad
         await new Promise((resolve, reject) => {
           connection.query(
-            'UPDATE iusuari SET quantitat = quantitat + ? WHERE usuari_id = ? AND item_id = ?',
+            'UPDATE items_usuaris SET quantitat = quantitat + ? WHERE usuari_id = ? AND item_id = ?',
             [quantitat, userId, itemId],
             (err, result) => {
               if (err) reject(err)
@@ -166,7 +166,7 @@ router.post('/', auth, async (req, res) => {
         // Si no existe, insertar un nuevo registro
         await new Promise((resolve, reject) => {
           connection.query(
-            'INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)',
+            'INSERT INTO items_usuaris (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)',
             [userId, itemId, quantitat, nom],
             (err, result) => {
               if (err) reject(err)
@@ -209,7 +209,7 @@ router.post('/', auth, async (req, res) => {
 //   const { userId, itemId, totalCost, nom } = req.body
 
 //   const insertQuery = `
-//     INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
+//     INSERT INTO items_usuaris (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
 //   `
 
 //   db.query(insertQuery, [userId, itemId, totalCost, nom], (err, result) => {
@@ -234,7 +234,7 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
   }
 
   const checkQuery = `
-    SELECT quantitat FROM iusuari WHERE usuari_id = ? AND item_id = ?
+    SELECT quantitat FROM items_usuaris WHERE usuari_id = ? AND item_id = ?
   `
 
   db.query(checkQuery, [userId, itemId], (err, results) => {
@@ -250,7 +250,7 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
       const newQuantity = currentQuantity + totalCost
 
       const updateQuery = `
-        UPDATE iusuari SET quantitat = ? WHERE usuari_id = ? AND item_id = ?
+        UPDATE items_usuaris SET quantitat = ? WHERE usuari_id = ? AND item_id = ?
       `
 
       db.query(
@@ -273,7 +273,7 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
     } else {
       // No existe, insertar nuevo registro
       const insertQuery = `
-        INSERT INTO iusuari (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
+        INSERT INTO items_usuaris (usuari_id, item_id, quantitat, nom) VALUES (?, ?, ?, ?)
       `
 
       db.query(insertQuery, [userId, itemId, totalCost, nom], (err, result) => {
@@ -308,7 +308,7 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
  * /{id}:
  *   get:
  *     summary: Obtener ítems del usuario por ID
- *     description: Retorna los ítems de la tabla `iusuari` para el `usuari_id` especificado.
+ *     description: Retorna los ítems de la tabla `items_usuaris` para el `usuari_id` especificado.
  *     tags:
  *       - Items
  *     parameters:
@@ -344,7 +344,7 @@ router.post('/items_usuaris_cofre', auth, (req, res) => {
  *                       usuari_id:
  *                         type: string
  *                         example: "abc123"
- *                       # Agrega aquí los demás campos relevantes de tu tabla iusuari
+ *                       # Agrega aquí los demás campos relevantes de tu tabla items_usuaris
  *       '404':
  *         description: No se encontraron ítems para el ID proporcionado.
  *         content:
@@ -379,7 +379,7 @@ router.get('/:id', auth, async (req, res) => {
   try {
     const items = await new Promise((resolve, reject) => {
       db.query(
-        'SELECT * FROM iusuari WHERE usuari_id = ?',
+        'SELECT * FROM items_usuaris WHERE usuari_id = ?',
         [id],
         (err, result) => {
           if (err) reject(err)
@@ -481,7 +481,7 @@ router.put('/update', auth, async (req, res) => {
         // Verificar si la consulta a la base de datos está funcionando
         await new Promise((resolve, reject) => {
           connection.query(
-            'UPDATE iusuari SET quantitat = quantitat - ? WHERE usuari_id = ? AND id = ?',
+            'UPDATE items_usuaris SET quantitat = quantitat - ? WHERE usuari_id = ? AND id = ?',
             [quantitat, usuari_id, item_id],
             (err, result) => {
               if (err) {
