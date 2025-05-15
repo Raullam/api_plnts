@@ -141,7 +141,7 @@ router.post('/agregar', auth, (req, res) => {
  */
 
 // Ruta para obtener los usuarios que están en espera
-router.get('/lista', auth, (req, res) => {
+router.get('/usuaris_a_la_llista_de_matchmaking', auth, (req, res) => {
   const query = 'SELECT * FROM matchmaking_usuaris'
 
   db.query(query, (error, results) => {
