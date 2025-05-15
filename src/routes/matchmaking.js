@@ -106,7 +106,7 @@ router.post('/agregar', auth, (req, res) => {
 
 /**
  * @swagger
- * /lista:
+ * /usuaris_a_la_llista_de_matchmaking:
  *   get:
  *     summary: Obtener todos los usuarios en la lista de espera
  *     tags: [Matchmaking]
@@ -156,7 +156,7 @@ router.get('/usuaris_a_la_llista_de_matchmaking', auth, (req, res) => {
 
 /**
  * @swagger
- * /eliminar/{id}:
+ * /eliminar_usuari_de_la_llista_matchmaking/{id}:
  *   delete:
  *     summary: Elimina un usuario de la lista de espera por ID
  *     tags: [Matchmaking]
@@ -176,20 +176,26 @@ router.get('/usuaris_a_la_llista_de_matchmaking', auth, (req, res) => {
  */
 
 // Ruta para eliminar un usuario de la lista de espera
-router.delete('/eliminar/:id', auth, (req, res) => {
-  const { id } = req.params
-  const query = 'DELETE FROM matchmaking_usuaris WHERE id = ?'
+router.delete(
+  '/eliminar_usuari_de_la_llista_matchmaking/:id',
+  auth,
+  (req, res) => {
+    const { id } = req.params
+    const query = 'DELETE FROM matchmaking_usuaris WHERE id = ?'
 
-  db.query(query, [id], (error, result) => {
-    if (error) {
-      return res.status(500).json({
-        message: 'Error al eliminar usuario de la lista de espera',
-        error,
-      })
-    }
-    res.status(200).json({ message: 'Usuario eliminado de la lista de espera' })
-  })
-})
+    db.query(query, [id], (error, result) => {
+      if (error) {
+        return res.status(500).json({
+          message: 'Error al eliminar usuario de la lista de espera',
+          error,
+        })
+      }
+      res
+        .status(200)
+        .json({ message: 'Usuario eliminado de la lista de espera' })
+    })
+  },
+)
 /**
  * @swagger
  * /eliminar-correu/{correu}:
