@@ -108,7 +108,7 @@ router.post('/afegir_usuari_a_la_llista_matchmaking', auth, (req, res) => {
   const { correu, nacionalitat, codiPostal, nivell } = req.body
 
   const query = `
-    INSERT INTO matchmaking_usuaris (correu, nacionalitat, codiPostal, nivell)
+    INSERT INTO matchmaking_usuaris2 (correu, nacionalitat, codiPostal, nivell)
     VALUES (?, ?, ?, ?)`
 
   db.query(
