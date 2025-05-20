@@ -27,7 +27,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
 // Definir rutas utilizando archivos separados
 app.use('/usuaris', usuarisRoutes)
-app.use('/plantas', plantasRoutes)
+app.use('/plantes', plantasRoutes)
 app.use('/items', itemsRoutes)
 app.use('/api', loginRoutes)
 app.use('/items_usuaris', itemsUsuarisRoutes)
