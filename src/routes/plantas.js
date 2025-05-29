@@ -13,7 +13,7 @@ const router = express.Router() // Iniciar el router
 
 /**
  * @swagger
- * /plantas:
+ * /plantes:
  *   get:
  *     summary: Obtenir totes les plantes
  *     tags:
@@ -60,7 +60,7 @@ router.get('/', auth, (req, res) => {
 
 /**
  * @swagger
- * /plantas/{id}:
+ * /plantes/{id}:
  *   get:
  *     summary: Obtenir una planta per ID
  *     tags:
@@ -118,7 +118,7 @@ router.get('/:id', auth, (req, res) => {
 
 /**
  * @swagger
- * /plantas/usuaris/{id}:
+ * /plantes/usuaris/{id}:
  *   get:
  *     summary: Obtenir totes les plantes d'un usuari específic
  *     tags:
@@ -151,7 +151,7 @@ router.get('/usuaris/:id', auth, (req, res) => {
 })
 /**
  * @swagger
- * /plantas:
+ * /plantes:
  *   post:
  *     summary: Crear una nova planta
  *     description: Endpoint per crear una nova planta a la base de dades.
@@ -301,7 +301,7 @@ router.post('/', auth, (req, res) => {
 
 /**
  * @swagger
- * /plantas/{id}:
+ * /plantes/{id}:
  *   put:
  *     summary: Actualitzar una planta
  *     description: Modifica les dades d'una planta existent.
@@ -412,7 +412,7 @@ router.put('/:id', auth, (req, res) => {
 
 /**
  * @swagger
- * /plantas/{id}:
+ * /plantes/{id}:
  *   delete:
  *     summary: Elimina una planta
  *     description: Esborra una planta de la base de dades.

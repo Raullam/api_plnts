@@ -753,4 +753,161 @@ router.put('/mazo/:usuarioId', (req, res) => {
   })
 })
 
+/**
+ * @swagger
+ * /le/add/{userId}:
+ *   put:
+ *     summary: Sumar LE al usuario
+ *     description: Aumenta la cantidad de LE del usuario especificado.
+ *     tags:
+ *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: ID del usuario
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 100
+ *     responses:
+ *       200:
+ *         description: LE sumado con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: LE sumado con éxito
+ *       400:
+ *         description: Error de validación o parámetros inválidos
+ *       500:
+ *         description: Error interno del servidor
+ */
+
+// Sumar LE
+router.put('/le/add/:userId', auth, async (req, res) => {
+  const { userId } = req.params
+  const { amount } = req.body
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ error: 'Amount debe ser mayor a 0' })
+  }
+
+  try {
+    await new Promise((resolve, reject) => {
+      db.query(
+        'UPDATE usuaris SET LE = LE + ? WHERE id = ?',
+        [amount, userId],
+        (err, result) => {
+          if (err) reject(err)
+          resolve(result)
+        },
+      )
+    })
+    res.json({ success: true, message: 'LE sumado con éxito' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+/**
+ * @swagger
+ * /le/subtract/{userId}:
+ *   put:
+ *     summary: Restar LE al usuario
+ *     description: Disminuye la cantidad de LE del usuario si tiene suficiente saldo.
+ *     tags:
+ *       - Usuaris
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: ID del usuario
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 50
+ *     responses:
+ *       200:
+ *         description: LE restado con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: LE restado con éxito
+ *       400:
+ *         description: LE insuficiente o parámetros inválidos
+ *       500:
+ *         description: Error interno del servidor
+ */
+
+// Restar LE
+router.put('/le/subtract/:userId', auth, async (req, res) => {
+  const { userId } = req.params
+  const { amount } = req.body
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ error: 'Amount debe ser mayor a 0' })
+  }
+
+  try {
+    // Verificar que el usuario tenga suficiente LE antes de restar
+    db.query(
+      'SELECT LE FROM usuaris WHERE id = ?',
+      [userId],
+      (err, results) => {
+        if (err) return res.status(500).json({ error: err.message })
+
+        const currentLE = results[0]?.LE ?? 0
+        if (currentLE < amount) {
+          return res.status(400).json({ error: 'LE insuficiente' })
+        }
+
+        db.query(
+          'UPDATE usuaris SET LE = LE - ? WHERE id = ?',
+          [amount, userId],
+          (err, result) => {
+            if (err) return res.status(500).json({ error: err.message })
+            res.json({ success: true, message: 'LE restado con éxito' })
+          },
+        )
+      },
+    )
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router // Exportar el router
