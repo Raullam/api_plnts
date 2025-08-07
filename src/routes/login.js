@@ -4,11 +4,13 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import { OAuth2Client } from 'google-auth-library'
+import fetch from 'node-fetch' // Necesario para llamar a la API de Google
 
 dotenv.config()
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 const router = express.Router()
+
 /**
  * @swagger
  * tags:
@@ -104,7 +106,7 @@ router.post('/login', async (req, res) => {
  * @swagger
  * /login/google:
  *   post:
- *     summary: Login usando Google ID Token
+ *     summary: Login usando Google ID Token o Access Token
  *     tags:
  *       - Auth
  *     requestBody:
@@ -116,36 +118,77 @@ router.post('/login', async (req, res) => {
  *             properties:
  *               idToken:
  *                 type: string
- *             required:
- *               - idToken
+ *                 description: Google ID Token (preferido)
+ *               accessToken:
+ *                 type: string
+ *                 description: Google Access Token (fallback para móvil web)
  *     responses:
  *       200:
  *         description: Login con Google exitoso
  *       400:
- *         description: Falta el ID Token
+ *         description: Falta el ID Token o Access Token
  *       401:
  *         description: Token de Google inválido
  */
 
-// Ruta de login con Google
-router.post('/login/google', async (req, res) => {
-  const { idToken } = req.body
+// Función para obtener información del usuario usando Access Token
+async function getUserInfoFromAccessToken(accessToken) {
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`,
+  )
 
-  if (!idToken) {
-    return res.status(400).json({ error: 'Falta el ID Token de Google' })
+  if (!response.ok) {
+    throw new Error('Error al obtener información del usuario con Access Token')
+  }
+
+  const userInfo = await response.json()
+  return {
+    email: userInfo.email,
+    name: userInfo.name,
+    picture: userInfo.picture,
+  }
+}
+
+// Ruta de login con Google - ACTUALIZADA para soportar tanto idToken como accessToken
+router.post('/login/google', async (req, res) => {
+  const { idToken, accessToken } = req.body
+
+  if (!idToken && !accessToken) {
+    return res.status(400).json({
+      error: 'Falta el ID Token o Access Token de Google',
+      details:
+        'Debe proporcionar idToken (preferido) o accessToken como fallback',
+    })
   }
 
   try {
-    // Verificar el ID Token con Google
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    })
+    let email, name, picture
 
-    const payload = ticket.getPayload()
-    const email = payload.email
-    const name = payload.name
-    const picture = payload.picture
+    // Priorizar idToken si está disponible
+    if (idToken) {
+      console.log('🔑 Usando ID Token para autenticación')
+
+      // Verificar el ID Token con Google
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      })
+
+      const payload = ticket.getPayload()
+      email = payload.email
+      name = payload.name
+      picture = payload.picture
+    } else if (accessToken) {
+      console.log('🔑 Usando Access Token para autenticación (fallback)')
+
+      // Usar Access Token para obtener información del usuario
+      const userInfo = await getUserInfoFromAccessToken(accessToken)
+      email = userInfo.email
+      name = userInfo.name
+      picture = userInfo.picture
+    }
+
+    console.log('✅ Información obtenida de Google:', { email, name })
 
     // Buscar si el usuario ya existe en la base de datos
     const results = await queryPromise(
@@ -156,8 +199,10 @@ router.post('/login/google', async (req, res) => {
     let usuario
     if (results.length > 0) {
       usuario = results[0] // Usuario existente
+      console.log('👤 Usuario existente encontrado:', usuario.correu)
     } else {
       // Si el usuario no existe, crearlo en la base de datos
+      console.log('🆕 Creando nuevo usuario:', email)
       const insertQuery =
         'INSERT INTO usuaris (nom, correu, contrasenya, imatgePerfil) VALUES (?, ?, ?, ?)'
       const insertResult = await queryPromise(insertQuery, [
@@ -182,10 +227,28 @@ router.post('/login/google', async (req, res) => {
       { expiresIn: '1h' },
     )
 
-    res.json({ message: 'Login con Google exitoso', token, usuario })
+    console.log('🎉 Login con Google exitoso para:', email)
+    res.json({
+      message: 'Login con Google exitoso',
+      token,
+      usuario,
+      authMethod: idToken ? 'idToken' : 'accessToken', // Para debug
+    })
   } catch (error) {
-    console.error('Error verificando el ID Token de Google:', error)
-    return res.status(401).json({ error: 'Token de Google inválido' })
+    console.error('❌ Error verificando token de Google:', error)
+
+    // Proporcionar más detalles del error para debug
+    if (error.message.includes('Access Token')) {
+      return res.status(401).json({
+        error: 'Access Token de Google inválido',
+        details: error.message,
+      })
+    }
+
+    return res.status(401).json({
+      error: 'Token de Google inválido',
+      details: error.message,
+    })
   }
 })
 
